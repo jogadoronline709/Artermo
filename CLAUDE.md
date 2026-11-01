@@ -1,47 +1,49 @@
 # ArTermo — Instruções do projeto
 
 ## 1. Objetivo
-Construir um aplicativo chamado **ArTermo — Propriedades do Ar**, destinado ao estudo de Transferência de Calor. O aplicativo permite consultar, separadamente, tabelas de propriedades do ar de três referências configuráveis (Kreith, Incropera e Çengel), interpolar propriedades para uma temperatura informada e calcular a média aritmética entre as referências.
+Aplicativo **ArTermo — Propriedades Termofísicas**, destinado ao estudo de Transferência de Calor. O aplicativo traz embutidas tabelas de propriedades de gases e fluidos (inicialmente **Ar** e **Água a 1 atm**), cada fluido com referências bibliográficas separadas (Kreith, Incropera e Çengel). Permite consultar cada referência, interpolar propriedades para uma temperatura informada e calcular a média aritmética entre as referências.
 
-O produto inicial deve ser uma **PWA (Progressive Web App)**: interface responsiva para computador e celular, instalável na tela inicial e capaz de funcionar offline depois do primeiro carregamento. Não desenvolver aplicativo nativo nesta primeira versão.
+O produto é uma **PWA (Progressive Web App)**: interface responsiva para computador e celular, instalável na tela inicial e capaz de funcionar offline depois do primeiro carregamento. Não desenvolver aplicativo nativo nesta versão.
 
 ## 2. Princípios obrigatórios
 - Idioma da interface: português do Brasil (pt-BR).
 - Sistema de unidades padrão: SI.
 - Unidade de temperatura padrão na interface: °C.
 - Normalizar internamente a temperatura para °C, independentemente da unidade original de cada tabela (°C, K ou °F).
-- Não inventar, estimar ou preencher como se fossem reais valores das tabelas de Kreith, Incropera ou Çengel.
-- Não copiar, baixar, raspar ou distribuir tabelas integrais protegidas por direitos autorais. As tabelas devem ser inseridas pelo usuário, que consulta seus próprios livros, ou importadas de arquivos preparados por ele.
-- Os três conjuntos de dados devem ser independentes e editáveis. Edição, ano, página, pressão de referência e unidade original devem ser registrados por fonte.
-- Dados de demonstração, caso usados para desenvolver a interface, devem ser claramente marcados como **SIMULADOS — NÃO USAR EM CÁLCULOS REAIS** e removidos da experiência normal de produção.
+- **Dados embutidos:** as tabelas vêm de arquivos fornecidos pelo dono do projeto, que responde pelo direito de uso. Cada referência cita autores, título, edição, ano e página/tabela conforme informado. Nenhum valor é inventado, estimado ou completado — nem para "preencher" uma tabela incompleta.
+- As tabelas são **somente leitura** no app. O usuário não cadastra, edita, importa nem apaga dados de tabela.
+- Cada fluido e cada referência têm seu próprio conjunto de linhas. Nunca misturar dados de fluidos ou de referências diferentes.
 - Não afirmar que a média é um valor experimentalmente mais correto. Identificá-la como média aritmética das referências selecionadas.
-- Antes de concluir, executar testes, lint (se configurado) e build. Corrigir erros encontrados.
+- Testes usam apenas números sintéticos, identificados como dados de teste, nunca números atribuídos aos livros.
+- Antes de concluir, executar testes, lint e build (`npm run check`). Corrigir erros encontrados.
 
 ## 3. Stack e arquitetura
-Use versões estáveis atuais e consulte a documentação oficial antes de escolher/configurar dependências:
 - React + TypeScript + Vite.
-- CSS responsivo; pode usar Tailwind CSS se isso simplificar a consistência visual.
-- PWA com `vite-plugin-pwa` ou solução equivalente mantida.
-- IndexedDB para persistência local (preferencialmente Dexie ou alternativa equivalente).
+- CSS responsivo próprio (`src/styles.css`).
+- PWA com `vite-plugin-pwa`.
+- IndexedDB (Dexie) apenas para preferências, favoritos e histórico.
 - Vitest para testes unitários.
-- Biblioteca de gráficos leve, por exemplo Recharts, para comparar propriedades por temperatura.
+- Recharts para o gráfico de propriedade × temperatura.
 
-Arquitetura inicialmente **frontend-only**, sem backend, login ou envio de dados para nuvem. Os dados permanecem no dispositivo. Criar funções claras para exportar/importar backup JSON e importar tabelas CSV. Manter o código preparado para uma futura camada de sincronização, sem implementá-la agora.
+Arquitetura **frontend-only**, sem backend, login ou envio de dados para nuvem. As tabelas entram no bundle (funcionam offline).
 
-## 4. Fontes bibliográficas iniciais
-Criar três registros vazios e editáveis:
-1. Kreith
-2. Incropera
-3. Çengel
+## 4. Fluidos e referências
+Fluidos atuais (registro em `src/data/fluids/registry.ts`):
 
-Não presumir edição, ano, página, título traduzido ou valores. O usuário preencherá os metadados de acordo com os exemplares que utiliza. A fonte deve aceitar nome curto, autores, título, edição, ano, página/tabela, pressão de referência, unidade original de temperatura e observações.
+| id | Nome exibido | Categoria | Faixa válida |
+|---|---|---|---|
+| `ar` | Ar | Gás | — |
+| `agua` | Água (1 atm) | Líquido | 0 a 100 °C |
 
-Cada fonte possui seu próprio conjunto de linhas. Nunca misturar os dados de uma referência dentro de outra.
+Cada um tem as referências Kreith, Incropera e Çengel. Enquanto o dono não fornecer a tabela, a referência fica vazia e a interface mostra "Tabela ainda não disponível nesta versão do app."
+
+Metadados por referência (`ReferenceDef`): nome curto, autores, título, edição, ano, página/tabela, pressão de referência, unidade original de temperatura, unidades das colunas e observações. Não presumir nenhum deles.
+
+**Água (1 atm):** se a tabela do livro for de líquido saturado, registrar `pressureKPa: 101.325` e explicar a aproximação em `notes` (entre 0 e 100 °C o líquido saturado é tratado como água a 1 atm). Fora de 0–100 °C, Consultar e Comparar mostram alerta permanente (gelo/vapor; acima de 100 °C a tabela de líquido saturado corresponde à pressão de saturação).
 
 ## 5. Propriedades e unidades canônicas
-Suportar pelo menos estas propriedades:
 
-| Propriedade | Símbolo sugerido | Unidade canônica |
+| Propriedade | Símbolo | Unidade canônica |
 |---|---:|---|
 | Massa específica | ρ | kg/m³ |
 | Calor específico a pressão constante | cp | J/(kg·K) |
@@ -51,158 +53,100 @@ Suportar pelo menos estas propriedades:
 | Difusividade térmica | α | m²/s |
 | Número de Prandtl | Pr | adimensional |
 
-O usuário deve conseguir cadastrar valores publicados diretamente na tabela. Também deve ser possível marcar propriedades calculadas pelo aplicativo. Distinguir claramente **valor tabelado** de **valor calculado**.
+Distinguir claramente **valor tabelado** de **valor calculado**. Conversões de entrada ficam em `src/domain/units.ts` (temperatura °C/K/°F; cp em J ou kJ; μ em Pa·s, mPa·s, μPa·s e escalas 10⁻ⁿ; etc.). Mostrar as unidades ao lado de todos os valores. Nunca converter apenas o rótulo sem converter o valor.
 
-Conversões de entrada necessárias:
-- Temperatura: °C, K e °F para °C.
-- cp: J/(kg·K) e kJ/(kg·K) para J/(kg·K).
-- μ: Pa·s, mPa·s e μPa·s para Pa·s.
-- Demais propriedades: validar e converter unidades suportadas para as unidades canônicas.
-
-Mostrar as unidades ao lado de todos os campos e resultados. Nunca converter apenas o rótulo sem converter o valor.
-
-## 6. Cadastro e edição das tabelas
-Criar uma área **Biblioteca de dados** com:
-- Lista das três fontes e indicação de quantas linhas cada tabela possui.
-- Cadastro/edição dos metadados da referência.
-- Inclusão, edição e exclusão de linhas de temperatura e propriedades.
-- Ordenação automática por temperatura, com validação contra temperaturas duplicadas.
-- Campos de propriedade opcionais: célula vazia significa dado ausente, nunca zero.
-- Importação CSV com pré-visualização, mapeamento de colunas e validação antes de gravar.
-- Exportação CSV de cada fonte.
-- Exportação e restauração de backup completo em JSON.
-- Confirmação antes de excluir fonte, tabela ou linha.
-
-Aceitar CSV separado por vírgula ou ponto e vírgula e números com ponto ou vírgula decimal, sem interpretar incorretamente separadores. Disponibilizar um modelo CSV vazio com cabeçalhos e instruções.
-
-Cabeçalhos sugeridos do CSV:
-`temperature,temperature_unit,density,density_unit,specific_heat,specific_heat_unit,conductivity,conductivity_unit,dynamic_viscosity,dynamic_viscosity_unit,prandtl,kinematic_viscosity,kinematic_viscosity_unit,thermal_diffusivity,thermal_diffusivity_unit`
-
-Se a unidade for definida nos metadados da fonte, permitir omiti-la por linha. Validar a consistência e mostrar erros linha a linha antes da importação.
+## 6. Gases/Fluidos
+- Barra de pesquisa: ignora acentos, maiúsculas e espaços e procura no nome, na condição e nos apelidos (ex.: "agua", "water", "H₂O").
+- Cartões de fluido com nome exibido, categoria e quantas referências têm dados.
+- Página do fluido: aviso de faixa válida, botão **Consultar este fluido** (define o fluido ativo) e abas por referência com citação, pressão, observações e a **tabela completa somente leitura**, nas unidades do livro.
+- Tabela embutida com erro de validação aparece marcada e não entra nos cálculos (o teste `fluidLoader.test.ts` impede que isso seja publicado).
 
 ## 7. Consulta e interpolação
-Tela principal **Consultar propriedades**:
-- Campo de temperatura desejada, aceitando decimal.
-- Seletor de unidade de entrada (°C, K ou °F), com °C padrão.
-- Abas ou cartões para consultar separadamente Kreith, Incropera e Çengel.
-- Aba **Comparar / Média**.
-- Exibir propriedades disponíveis, unidades, indicação de dado tabelado ou interpolado, fonte, edição e página quando cadastradas.
+Tela **Consultar**:
+- Faixa "Fluido: <nome> · trocar" no topo; as abas mostram só as referências do fluido ativo.
+- Campo de temperatura (decimal), seletor °C/K/°F (°C padrão).
+- Exibir propriedades, unidades, indicação de tabelado/interpolado, fonte, edição e página.
 
-Para cada propriedade e fonte, usar interpolação linear entre os dois pontos válidos que envolvem a temperatura solicitada:
+Interpolação linear entre os dois pontos válidos que envolvem a temperatura:
 
 `y = y1 + ((T - T1) / (T2 - T1)) * (y2 - y1)`
 
 Regras:
 1. Converter a temperatura solicitada para °C antes da consulta.
-2. Se existir uma linha exatamente nessa temperatura (considerando tolerância numérica pequena), retornar o valor da linha sem interpolação e marcar **valor tabelado**.
-3. Caso contrário, localizar o ponto válido imediatamente inferior e o imediatamente superior para aquela propriedade e interpolar. Mostrar T1, y1, T2, y2, fração de interpolação e resultado.
-4. Cada propriedade pode ter dados ausentes em algumas linhas. Não usar zero como substituto. Localizar os pontos válidos que efetivamente envolvem a temperatura; se não houver par, informar que não há dados suficientes.
-5. Por padrão, não extrapolar além da menor/maior temperatura disponível. Mostrar mensagem clara e faixa disponível. Uma eventual opção avançada de extrapolação deve vir desativada por padrão, exigir confirmação e marcar o resultado como extrapolado/estimado.
+2. Linha exatamente nessa temperatura (tolerância pequena) → valor da linha, marcado **valor tabelado**.
+3. Caso contrário, usar o ponto válido imediatamente inferior e o imediatamente superior daquela propriedade. Mostrar T1, y1, T2, y2, fração e resultado.
+4. Dado ausente nunca vira zero; sem par válido, informar que não há dados suficientes.
+5. Não extrapolar por padrão. A extrapolação é opção avançada, desativada por padrão, com confirmação, e marca o resultado como extrapolado.
 6. Nunca interpolar entre dados de fontes diferentes.
 7. Proteger contra divisão por zero, temperaturas duplicadas e valores não numéricos.
 
-Criar uma janela ou seção **Como foi calculado?** que apresente a fórmula e substitua os símbolos pelos valores efetivamente usados. O usuário deve conseguir conferir o intervalo e o resultado.
+Seção **Como foi calculado?** com a fórmula e os valores efetivamente usados.
 
 ## 8. Média das referências
-Na aba **Comparar / Média**:
-- Interpolar primeiro cada fonte independentemente para a temperatura escolhida.
-- Só depois calcular a média aritmética dos resultados interpolados para cada propriedade.
-- Exibir colunas Kreith, Incropera, Çengel e Média.
-- Mostrar quantas fontes entraram no cálculo (por exemplo, 3/3 ou 2/3), quais foram excluídas e por quê.
-- Criar dois modos explícitos:
-  a. **Exigir as 3 referências** — se faltar resultado em qualquer fonte, não apresentar média como se fosse completa.
-  b. **Média das fontes disponíveis** — calcular com os resultados válidos, sempre mostrando n/3.
-- A média deve ser calculada propriedade por propriedade. Não preencher dado ausente com zero.
-- Mostrar também mínimo, máximo e amplitude entre fontes para ajudar a visualizar divergências. Opcionalmente mostrar desvio-padrão, com explicação do critério utilizado.
-- Exibir aviso de compatibilidade: comparar/mediar apenas tabelas do mesmo fluido e com pressão de referência compatível. Se a pressão não estiver cadastrada ou for diferente, alertar e bloquear a média por padrão; permitir uma substituição manual claramente avisada, sem esconder a diferença.
-- Identificar a média como **média aritmética das referências**, não como propriedade certificada ou valor oficial.
+Na aba **Comparar / Média** (sempre dentro do fluido ativo):
+- Interpolar cada referência independentemente; só depois calcular a média aritmética, propriedade por propriedade.
+- Mostrar n/N, quais referências foram excluídas e por quê.
+- Modos **Exigir todas** e **Média das fontes disponíveis**.
+- Mostrar mínimo, máximo, amplitude e desvio-padrão amostral (critério explicado).
+- Bloquear a média por padrão quando a pressão não estiver cadastrada, for diferente ou os fluidos diferirem; permitir substituição manual com aviso permanente.
+- A seleção de referências do Comparar é guardada por fluido.
 
 ## 9. Propriedades derivadas
-Implementar, quando os dados necessários estiverem disponíveis, os cálculos:
-- `ν = μ / ρ`
-- `α = k / (ρ * cp)`
-- `Pr = μ * cp / k`
-
-Usar sempre unidades canônicas internamente. Para essas relações, cp deve estar em J/(kg·K), μ em Pa·s, k em W/(m·K) e ρ em kg/m³.
-
-Quando a referência já publicar ν, α ou Pr, conservar o valor publicado e identificá-lo como tabelado. Permitir alternar entre valor publicado e calculado, quando ambos existirem, e mostrar a diferença percentual. Não substituir silenciosamente o valor tabelado pelo calculado.
+- `ν = μ / ρ`, `α = k / (ρ * cp)`, `Pr = μ * cp / k`, sempre em unidades canônicas.
+- Valor publicado é conservado e identificado como tabelado; permitir alternar entre publicado e calculado e mostrar a diferença percentual. Nunca substituir silenciosamente.
 
 ## 10. Interface e experiência do usuário
-Criar visual técnico, limpo e fácil de usar, sem excesso de elementos:
-- Cabeçalho com nome ArTermo e indicação de modo offline.
-- Navegação simples: **Consultar**, **Comparar**, **Biblioteca**, **Configurações**.
-- Priorizar uso em celular: botões grandes, campos confortáveis, tabelas adaptadas para cartões ou rolagem horizontal, sem exigir zoom.
-- Em desktop, aproveitar a largura para exibir tabela comparativa.
-- Gráfico opcional de propriedade versus temperatura, com uma curva por referência e legenda identificável.
-- Botão para copiar resultado e exportar consulta (CSV ou PDF, caso a geração de PDF seja confiável e simples).
-- Histórico local de consultas recentes e possibilidade de favoritar temperaturas.
-- Tema claro/escuro, mantendo contraste e acessibilidade.
-- Estados vazios instrutivos explicando como cadastrar/importar as tabelas, em vez de apresentar números fictícios.
+- Cabeçalho com "ArTermo — Propriedades termofísicas" e indicação de modo offline.
+- Navegação: **Consultar**, **Comparar**, **Gases/Fluidos**, **Configurações**.
+- Priorizar celular: botões grandes, tabelas com rolagem horizontal, sem exigir zoom.
+- Gráfico opcional de propriedade × temperatura, uma curva por referência.
+- Copiar resultado e exportar consulta (CSV; PDF pela impressão do navegador).
+- Histórico local de consultas e temperaturas favoritas.
+- Tema claro/escuro com contraste adequado.
+- Estados vazios explicam que a tabela ainda não foi incluída, sem mostrar números fictícios.
 
 ## 11. PWA e funcionamento offline
-- Criar manifest, ícones provisórios próprios, nome curto e descrição.
-- Configurar service worker para armazenar os arquivos necessários à aplicação.
-- Depois do primeiro carregamento, permitir abrir e consultar os dados salvos sem internet.
-- Mostrar estado de instalação e instruções de instalação compatíveis com o navegador/dispositivo.
-- Dados do usuário devem persistir localmente em IndexedDB e sobreviver ao fechamento do navegador.
-- Alertar que apagar os dados do navegador pode remover os dados locais; incentivar exportação periódica de backup.
+- Manifest, ícones, nome curto e descrição.
+- Service worker armazena os arquivos do app, inclusive as tabelas embutidas.
+- Depois do primeiro carregamento, abre e consulta sem internet.
+- Mostrar estado e instruções de instalação por navegador/dispositivo.
+- Preferências, favoritos e histórico persistem em IndexedDB.
 
 ## 12. Privacidade e segurança
-- Não adicionar autenticação ou backend na primeira versão.
-- Não transmitir tabelas, consultas ou backups para terceiros.
-- Validar todos os arquivos importados; limitar tamanho; tratar erros sem travar a interface.
-- Nunca executar conteúdo vindo de CSV/JSON como código.
+- Sem autenticação ou backend.
+- Não transmitir consultas para terceiros.
+- Conteúdo de CSV é tratado só como dado, nunca executado.
 
 ## 13. Testes obrigatórios
-Criar testes automatizados para:
-- Interpolação exata em ponto da tabela.
-- Interpolação entre dois pontos (incluindo resultado decimal).
-- Temperatura abaixo/acima da faixa e bloqueio de extrapolação.
-- Propriedade com valores ausentes.
-- Fontes com malhas de temperatura diferentes.
-- Conversões °C/K/°F.
-- Conversões de cp e μ.
-- Média de 3 fontes e média de 2 fontes disponíveis.
-- Modo que exige 3 fontes.
-- Compatibilidade/incompatibilidade de pressão.
-- Cálculo de ν, α e Pr e conversão correta de unidades.
-- Importação CSV com ponto e vírgula e decimal brasileiro.
-- Exportação e restauração JSON.
+- Interpolação exata, entre dois pontos, fora da faixa e bloqueio de extrapolação.
+- Propriedade com valores ausentes; fontes com malhas de temperatura diferentes.
+- Conversões °C/K/°F, cp e μ.
+- Média de 3 e de 2 fontes; modo que exige todas; compatibilidade de pressão.
+- ν, α e Pr com unidades corretas.
+- Leitura CSV com ponto e vírgula, decimal brasileiro e comentários.
+- Fluidos: busca, faixa válida, carregamento das tabelas embutidas, isolamento entre fluidos e **validade de todas as tabelas embutidas**.
+- Rotas (inclusive links antigos `#/biblioteca` → Gases/Fluidos) e atualização do banco local.
 
-Os testes devem usar números sintéticos conhecidos e identificar explicitamente que são dados de teste, nunca números atribuídos aos livros.
+## 14. Organização
+- `src/domain/`: tipos, unidades, interpolação, média, fórmulas e fluidos (busca, faixa válida).
+- `src/data/fluids/`: registro, carregador e uma pasta por fluido (`fluid.ts` + CSVs).
+- `src/data/`: leitor CSV, IndexedDB e repositório (preferências, favoritos, histórico).
+- `src/components/`, `src/pages/`, `src/hooks/`, `src/lib/`, `src/tests/`, `public/`.
 
-## 14. Organização sugerida
-Manter separação clara entre:
-- `src/domain/`: tipos, unidades, interpolação, média e fórmulas.
-- `src/data/`: IndexedDB, importação/exportação, repositórios.
-- `src/components/`: componentes reutilizáveis.
-- `src/pages/`: telas.
-- `src/hooks/`: hooks de estado e acesso aos dados.
-- `src/tests/`: testes unitários.
-- `public/`: manifest e ícones PWA.
+Preservar a separação entre lógica de cálculo, dados e interface.
 
-Ajuste a organização se houver motivo técnico, mas preserve a separação entre lógica de cálculo, persistência e interface.
-
-## 15. Plano de execução para Claude Code
-Trabalhe por etapas, sem tentar gerar tudo em um único arquivo:
-1. Inspecione a pasta e informe se há projeto existente; não apague arquivos do usuário.
-2. Crie o projeto e configure TypeScript, Vite, PWA, persistência e testes.
-3. Implemente primeiro as funções puras de unidades, interpolação, média e propriedades derivadas.
-4. Escreva e execute os testes dessas funções antes de construir as telas.
-5. Implemente biblioteca de fontes e editor/importador de tabelas.
-6. Implemente consulta individual e comparação/média.
-7. Implemente PWA/offline, responsividade, histórico e exportação.
-8. Execute testes, lint e build; corrija todos os erros.
-9. Escreva README em português com instalação local, execução, testes, build, publicação e instalação no celular.
-10. Ao final, mostre a estrutura criada, comandos para rodar e limitações conhecidas.
+## 15. Como adicionar um fluido ou uma tabela
+1. **Fluido novo:** crie `src/data/fluids/<id>/fluid.ts` exportando um `FluidDef` (id, nome, condição, categoria, apelidos de busca, faixa válida se houver, referências). Copie `agua/fluid.ts` como modelo.
+2. Inclua o fluido em `FLUID_DEFS`, em `src/data/fluids/registry.ts` (a ordem da lista é a ordem de exibição).
+3. **Tabela de uma referência:** crie `src/data/fluids/<id>/<refId>.csv` (ex.: `agua/kreith.csv`) com os cabeçalhos de `CSV_HEADERS` (`src/data/csv.ts`). Copie os números exatamente como fornecidos; use `#` no topo para citar a fonte.
+4. Preencha no `ReferenceDef` os metadados conforme informados pelo dono: autores, título, edição, ano, página/tabela, pressão de referência, unidade de temperatura e unidades das colunas.
+5. Se o livro usar uma escala de unidade que falte (ex.: μ em 10⁻⁶ Pa·s, α em 10⁻⁷ m²/s), adicione-a em `src/domain/units.ts` com teste em `units.test.ts`.
+6. Rode `npm run check`. O teste "todas as tabelas embutidas são válidas" falha se houver qualquer erro de validação ou CSV sem fluido/referência correspondente.
 
 ## 16. Critérios de aceite
-O projeto só está concluído quando:
-- Posso cadastrar os dados de Kreith, Incropera e Çengel separadamente.
-- Posso editar os dados posteriormente sem alterar o código.
-- Posso consultar uma fonte isolada e ver a interpolação detalhada.
-- Posso comparar as três fontes e obter a média com indicação clara de n/3.
-- O app trata ausência de dados, unidade e pressão sem mascarar problemas.
-- Os dados ficam salvos localmente e podem ser exportados/importados.
+- Gases/Fluidos lista Ar e Água (1 atm), com busca funcionando com acentos, maiúsculas e "H₂O".
+- Cada referência mostra a tabela somente leitura, ou o aviso de tabela não disponível.
+- Consultar e Comparar usam o fluido ativo, com interpolação detalhada e média com n/N.
+- O app trata ausência de dados, unidade, pressão e faixa válida sem mascarar problemas.
 - A interface funciona em desktop e celular e pode ser instalada como PWA.
-- Testes de cálculo passam e o build termina sem erros.
+- Testes passam e o build termina sem erros.

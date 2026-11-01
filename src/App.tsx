@@ -102,7 +102,7 @@ export default function App() {
             <path d="M22 9h5M22 13h4M22 17h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
           </svg>
           <span className="brand-name">ArTermo</span>
-          <span className="brand-sub">Propriedades do ar</span>
+          <span className="brand-sub">Propriedades termofísicas</span>
         </a>
         <span className={`net${online ? '' : ' is-offline'}`} role="status">
           <span className="net-dot" aria-hidden="true" />

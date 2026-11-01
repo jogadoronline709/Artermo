@@ -18,10 +18,10 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'ArTermo — Propriedades do Ar',
+        name: 'ArTermo — Propriedades Termofísicas',
         short_name: 'ArTermo',
         description:
-          'Consulta, interpolação e comparação de propriedades termofísicas do ar a partir das suas próprias tabelas de referência. Funciona offline.',
+          'Consulta, interpolação e comparação de propriedades termofísicas de gases e fluidos (Ar, Água a 1 atm…) a partir de tabelas de referência embutidas. Funciona offline.',
         lang: 'pt-BR',
         dir: 'ltr',
         start_url: base,

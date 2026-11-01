@@ -1,16 +1,16 @@
-# ArTermo — Propriedades do Ar
+# ArTermo — Propriedades Termofísicas
 
-Aplicativo web instalável (PWA) para estudo de Transferência de Calor. Você cadastra as tabelas de propriedades do ar dos **seus** exemplares de Kreith, Incropera e Çengel (ou de outras referências), e o ArTermo:
+Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTermo traz embutidas as tabelas de propriedades de gases e fluidos — **Ar** e **Água (1 atm)**, cada um com as referências Kreith, Incropera e Çengel — e:
 
 - interpola linearmente cada propriedade, em cada referência, para a temperatura pedida (°C, K ou °F);
 - mostra **como foi calculado** — fórmula, pontos T₁/y₁ e T₂/y₂, fração e resultado;
 - compara as referências lado a lado e calcula a **média aritmética das referências** com indicação n/N, mínimo, máximo, amplitude e desvio-padrão amostral;
 - calcula ν = μ/ρ, α = k/(ρ·cp) e Pr = μ·cp/k e compara com os valores publicados;
-- funciona offline depois do primeiro acesso e guarda tudo só no dispositivo (IndexedDB).
+- funciona offline depois do primeiro acesso.
 
-O app **não traz nenhum valor dos livros**. As três referências começam vazias. Os únicos números embutidos são os *dados simulados de demonstração* (opcionais, em Configurações) e os dados sintéticos dos testes — ambos fictícios e identificados como tal.
+As tabelas são **somente leitura** no app. Elas são fornecidas pelo dono do projeto e incluídas no código, sempre com a fonte citada (autores, título, edição, ano, página/tabela). Nenhum valor é inventado, estimado ou completado. Enquanto uma tabela não é incluída, a referência aparece como "Tabela ainda não disponível nesta versão do app."
 
-> Especificação completa do projeto: [`CLAUDE.md`](CLAUDE.md). Prompt original: [`docs/PROMPT_INICIAL.md`](docs/PROMPT_INICIAL.md).
+> Especificação do projeto: [`CLAUDE.md`](CLAUDE.md). Prompt original: [`docs/PROMPT_INICIAL.md`](docs/PROMPT_INICIAL.md).
 
 ## Requisitos
 
@@ -46,27 +46,38 @@ O modo offline (service worker) só funciona na versão de produção (`npm run 
 
 ## Como usar
 
-1. **Biblioteca** → abra Kreith, Incropera ou Çengel e preencha autores, título, edição, ano, página/tabela, **pressão de referência** e as unidades como aparecem no livro (ex.: μ em 10⁻⁷ Pa·s, cp em kJ/(kg·K)).
-2. Cadastre as linhas: **Adicionar linha** (o botão "Salvar e próxima linha" agiliza a digitação) ou **Importar CSV**. Célula vazia é dado ausente — nunca zero.
+1. **Gases/Fluidos** → pesquise o fluido (aceita "água", "agua", "water", "H₂O"…) e abra-o. Cada referência mostra a citação, a pressão de referência e a tabela completa, nas unidades do livro.
+2. Clique em **Consultar este fluido**. Consultar e Comparar passam a usar só as referências desse fluido (o topo mostra "Fluido: …").
 3. **Consultar** → digite a temperatura e escolha a referência. Abra "Como foi calculado?" para conferir a conta.
 4. **Comparar** → escolha as referências, o modo da média (exigir todas ou fontes disponíveis) e se ν, α e Pr devem usar o valor publicado ou o calculado.
-5. **Configurações** → exporte um **backup JSON** de tempos em tempos. Apagar os dados do navegador apaga as tabelas.
 
-### Importação CSV
+**Água (1 atm):** a faixa válida é de 0 a 100 °C. Fora dela, Consultar e Comparar mostram um alerta permanente: a 1 atm a água é gelo abaixo de 0 °C e vapor acima de 100 °C, e valores de uma tabela de líquido saturado acima de 100 °C correspondem à pressão de saturação.
 
-Baixe o modelo em Biblioteca → "Baixar modelo CSV com instruções" (há também o cabeçalho vazio em `public/modelo_dados_ar.csv`). Cabeçalhos:
+## Dados embutidos
+
+As tabelas ficam em `src/data/fluids/<fluido>/`:
+
+```
+src/data/fluids/
+  registry.ts        lista de fluidos (ordem de exibição)
+  loader.ts          CSV + metadados → fontes e linhas
+  ar/fluid.ts        metadados do Ar e das referências
+  ar/<ref>.csv       tabela de uma referência (ex.: kreith.csv)
+  agua/fluid.ts      metadados da Água (1 atm) e das referências
+  agua/<ref>.csv
+```
+
+Cada CSV usa os cabeçalhos abaixo (separador vírgula, ponto e vírgula ou tabulação; decimal com vírgula ou ponto; linhas iniciadas por `#` são comentários, úteis para citar a fonte):
 
 ```
 temperature,temperature_unit,density,density_unit,specific_heat,specific_heat_unit,conductivity,conductivity_unit,dynamic_viscosity,dynamic_viscosity_unit,prandtl,kinematic_viscosity,kinematic_viscosity_unit,thermal_diffusivity,thermal_diffusivity_unit
 ```
 
-- Separador vírgula, ponto e vírgula ou tabulação (detectado automaticamente).
-- Decimal com vírgula ou ponto; notação científica aceita (`1,846E-5`). Com separador vírgula, números com vírgula decimal precisam estar entre aspas (o Excel já faz isso).
-- Colunas `*_unit` são opcionais: se vazias, vale a unidade do cabeçalho (`T (K)`, `cp [kJ/kg·K]`) ou a unidade cadastrada na referência.
-- Cabeçalhos em português também são reconhecidos (`temperatura`, `massa_especifica`, `cp`, `k`, `mu`, `nu`, `alpha`, `Pr`…), e você pode ajustar o mapeamento antes de importar.
-- Antes de gravar, o app mostra a pré-visualização e os erros linha a linha (número inválido, unidade desconhecida, temperatura repetida, valor ≤ 0).
+- Colunas `*_unit` são opcionais: se vazias, vale a unidade do cabeçalho (`T (K)`, `cp [kJ/kg·K]`) ou a unidade declarada na referência em `fluid.ts`.
+- Célula vazia é dado ausente — nunca zero.
+- Um teste automático valida **todas** as tabelas embutidas: uma tabela com erro faz `npm test` falhar e não chega a ser publicada.
 
-Unidades aceitas na importação e na digitação:
+Unidades aceitas:
 
 | Propriedade | Canônica | Também aceita |
 |---|---|---|
@@ -78,7 +89,7 @@ Unidades aceitas na importação e na digitação:
 | ν, α | m²/s | mm²/s, cm²/s, 10⁻⁵ m²/s, 10⁻⁶ m²/s |
 | Pr | — | — |
 
-As unidades "10⁻ⁿ" servem para tabelas cujo cabeçalho diz, por exemplo, "μ·10⁷ (N·s/m²)": digite o número como está no livro e escolha 10⁻⁷ Pa·s.
+O passo a passo para incluir um fluido ou uma tabela está no [`CLAUDE.md`](CLAUDE.md), seção "Como adicionar um fluido ou uma tabela".
 
 ## Regras de cálculo
 
@@ -108,7 +119,7 @@ A instalação exige o app servido por HTTPS (GitHub Pages serve) ou `localhost`
 - **iPhone/iPad (Safari):** abra o endereço → botão **Compartilhar** → **Adicionar à Tela de Início**.
 - **Computador (Chrome/Edge):** ícone de instalar na barra de endereço.
 
-Abra o app uma vez com internet; depois ele abre e calcula offline. Os dados de cada dispositivo são independentes — use o backup JSON para levar as tabelas de um aparelho para outro.
+Abra o app uma vez com internet; depois ele abre e calcula offline. As tabelas vêm com o app; no dispositivo ficam só preferências, favoritos e histórico.
 
 Para testar no celular antes de publicar, rode `npm run build && npx vite preview --host` e acesse pelo IP do computador na mesma rede (sem HTTPS a instalação e o modo offline podem não funcionar; o restante funciona).
 
@@ -116,24 +127,24 @@ Para testar no celular antes de publicar, rode `npm run build && npx vite previe
 
 ```
 src/
-  domain/      cálculo puro: tipos, unidades, números pt-BR, interpolação, média, compatibilidade, derivadas
-  data/        IndexedDB (Dexie), repositório, CSV, backup JSON, dados simulados
-  hooks/       acesso reativo aos dados, configurações, rotas, estado online/instalação
-  components/  régua de temperatura, linhas de propriedade, "Como foi calculado?", comparação, gráfico, diálogos
-  pages/       Consultar, Biblioteca, editor de referência, Configurações
-  lib/         arquivos (download/cópia) e relatórios CSV/texto
+  domain/      cálculo puro: tipos, unidades, números pt-BR, interpolação, média, compatibilidade, derivadas, fluidos (busca e faixa válida)
+  data/        tabelas embutidas (fluids/), leitor CSV, IndexedDB (Dexie) para preferências, favoritos e histórico
+  hooks/       configurações, rotas, estado online/instalação
+  components/  régua de temperatura, linhas de propriedade, "Como foi calculado?", comparação, gráfico, tabela somente leitura
+  pages/       Consultar, Gases/Fluidos, página do fluido, Configurações
+  lib/         arquivos (download/cópia), seleção do Comparar e relatórios CSV/texto
   tests/       testes unitários (Vitest) com dados sintéticos
-public/        ícones PWA, favicon e modelo CSV
+public/        ícones PWA e favicon
 .github/       CI e publicação no GitHub Pages
 ```
 
 ## Privacidade
 
-Sem login, sem servidor, sem rastreamento. Tabelas, consultas e backups ficam no dispositivo. Arquivos importados são validados, limitados em tamanho (CSV 2 MB, backup 10 MB) e tratados apenas como dados.
+Sem login, sem servidor, sem rastreamento. Consultas, favoritos e preferências ficam no dispositivo.
 
 ## Limitações conhecidas
 
-- Os dados ficam por navegador/dispositivo; não há sincronização (o código separa domínio e persistência para permitir isso no futuro).
+- As tabelas só mudam com uma nova versão do app; não há edição pelo usuário.
 - Exportação em PDF usa a impressão do navegador ("Imprimir / PDF").
 - Só interpolação linear (sem splines), como pedido pela especificação.
 - `npm audit` aponta avisos em dependências de build do `vite-plugin-pwa` (workbox); não afetam o app publicado.
