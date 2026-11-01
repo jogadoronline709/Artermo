@@ -168,6 +168,16 @@ const HEADER_ALIASES: Record<FieldId, string[]> = {
   thermalDiffusivity_unit: ['thermaldiffusivityunit', 'alphaunit', 'unidadealpha', 'unidadedifusividade'],
   prandtl: ['prandtl', 'pr', 'numerodeprandtl'],
   prandtl_unit: ['prandtlunit'],
+  enthalpy: ['enthalpy', 'entalpia', 'h'],
+  enthalpy_unit: ['enthalpyunit', 'hunit', 'unidadeh', 'unidadeentalpia'],
+  internalEnergy: ['internalenergy', 'energiainterna', 'u'],
+  internalEnergy_unit: ['internalenergyunit', 'uunit', 'unidadeu', 'unidadeenergiainterna'],
+  entropyStd: ['entropystd', 'entropia', 'entropiapadrao', 's0', 'so'],
+  entropyStd_unit: ['entropystdunit', 's0unit', 'unidades0', 'unidadeentropia'],
+  relativePressure: ['relativepressure', 'pressaorelativa', 'prel'],
+  relativePressure_unit: ['relativepressureunit'],
+  relativeVolume: ['relativevolume', 'volumerelativo', 'vrel', 'vr'],
+  relativeVolume_unit: ['relativevolumeunit'],
 }
 
 /** Associa automaticamente colunas do arquivo aos campos do ArTermo. */

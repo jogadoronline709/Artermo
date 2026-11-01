@@ -150,10 +150,11 @@ describe('registro de fluidos', () => {
     expect(ORPHAN_CSVS).toEqual([])
   })
 
-  it('inclui Ar e Água (1 atm) com Kreith, Incropera e Çengel', () => {
-    expect(FLUID_DEFS.map((f) => f.id)).toEqual(['ar', 'agua'])
+  it('lista Ar, Ar (gás ideal) e Água (1 atm), nessa ordem', () => {
+    expect(FLUID_DEFS.map((f) => f.id)).toEqual(['ar', 'ar-gas-ideal', 'agua'])
     expect(findFluid('agua')?.def.condition).toBe('1 atm')
-    for (const f of FLUID_DEFS) expect(f.references.map((r) => r.shortName)).toEqual(['Kreith', 'Incropera', 'Çengel'])
+    for (const id of ['ar', 'agua']) expect(findFluid(id)?.def.references.map((r) => r.shortName)).toEqual(['Kreith', 'Incropera', 'Çengel'])
+    expect(findFluid('ar-gas-ideal')?.def.references.map((r) => r.shortName)).toEqual(['Çengel'])
   })
 
   it('id ausente ou desconhecido cai no Ar', () => {
@@ -168,5 +169,39 @@ describe('fluido de uma referência', () => {
     expect(fluidOfSourceId('agua-kreith')?.def.id).toBe('agua')
     expect(fluidOfSourceId('ar-cengel')?.def.id).toBe('ar')
     expect(fluidOfSourceId('nao-existe')).toBeUndefined()
+  })
+})
+
+describe('conjunto de propriedades e pressão por fluido', () => {
+  const r = ref('r', { inputUnits: {} })
+  it('o fluido repassa conjunto e uso da pressão para as fontes', () => {
+    const gas = loadFluid({ ...fluid('g', [r]), propertySet: 'gasIdeal', pressureApplies: false }, {})
+    expect(gas.sources[0].propertySet).toBe('gasIdeal')
+    expect(gas.sources[0].pressureApplies).toBe(false)
+    const plain = loadFluid(fluid('p', [r]), {})
+    expect(plain.sources[0].propertySet ?? 'transporte').toBe('transporte')
+    expect(plain.sources[0].pressureApplies).not.toBe(false)
+  })
+
+  const gasFluid = () => ({ ...fluid('g', [r]), propertySet: 'gasIdeal' as const, pressureApplies: false })
+
+  it('Pᵣ e vᵣ dispensam unidade; h sem unidade é erro', () => {
+    const ok = loadFluid(gasFluid(), { r: 'temperature (K),relative_pressure,relative_volume\n300,1.5,500' })
+    expect(ok.errors).toEqual({})
+    const bad = loadFluid(gasFluid(), { r: 'temperature (K),enthalpy\n300,300' })
+    expect(bad.errors['g-r'].join(' ')).toContain('Unidade de h')
+  })
+
+  it('coluna "Pr" em tabela de gás ideal é erro (seria lida como Prandtl)', () => {
+    const l = loadFluid(gasFluid(), { r: 'temperature (K),Pr\n300,1.3860' })
+    expect(l.rowsBySource['g-r']).toEqual([])
+    const msg = l.errors['g-r'].join(' ')
+    expect(msg).toContain('"Pr"')
+    expect(msg).toContain('relative_pressure')
+  })
+
+  it('coluna de gás ideal em tabela de transporte é erro', () => {
+    const l = loadFluid(fluid('t', [r]), { r: 'temperature (K),density (kg/m3),enthalpy (kJ/kg)\n300,1.2,300' })
+    expect(l.errors['t-r'].join(' ')).toContain('"enthalpy (kJ/kg)"')
   })
 })

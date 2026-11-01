@@ -27,11 +27,13 @@ function normFluid(s: string): string {
  * Verifica se as fontes podem ser comparadas/mediadas:
  * mesmo fluido e pressão de referência cadastrada e compatível.
  */
-export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' | 'pressureKPa'>[]): CompatResult {
+export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' | 'pressureKPa' | 'pressureApplies'>[]): CompatResult {
   const issues: CompatIssue[] = []
   if (sources.length < 2) return { compatible: true, issues }
 
-  const missing = sources.filter((s) => s.pressureKPa == null || !Number.isFinite(s.pressureKPa))
+  // Gás ideal: a pressão de referência não se aplica.
+  const checkPressure = !sources.some((s) => s.pressureApplies === false)
+  const missing = checkPressure ? sources.filter((s) => s.pressureKPa == null || !Number.isFinite(s.pressureKPa)) : []
   if (missing.length) {
     issues.push({
       kind: 'pressure_missing',
@@ -39,7 +41,7 @@ export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' |
     })
   }
 
-  const withP = sources.filter((s) => s.pressureKPa != null && Number.isFinite(s.pressureKPa))
+  const withP = !checkPressure ? [] : sources.filter((s) => s.pressureKPa != null && Number.isFinite(s.pressureKPa))
   if (withP.length >= 2) {
     const ps = withP.map((s) => s.pressureKPa as number)
     const pMin = Math.min(...ps)

@@ -81,3 +81,23 @@ describe('importação CSV', () => {
     expect(v.errors.length).toBeGreaterThan(0)
   })
 })
+
+describe('cabeçalhos de gás ideal', () => {
+  it('reconhece os nomes em português e mantém "pr" como Prandtl', () => {
+    const m = autoMap(['temperatura', 'entalpia', 'pressao_relativa', 'pr', 's0', 'volume_relativo', 'energia_interna'])
+    expect(m.enthalpy).toBe(1)
+    expect(m.relativePressure).toBe(2)
+    expect(m.prandtl).toBe(3)
+    expect(m.entropyStd).toBe(4)
+    expect(m.relativeVolume).toBe(5)
+    expect(m.internalEnergy).toBe(6)
+  })
+
+  it('lê um CSV de gás ideal com h em kJ/kg', () => {
+    const parsed = parseCsv('temperature (K);enthalpy (kJ/kg);relative_pressure\n300;1,5;2\n310;1,6;2,1')
+    const v = validateImport(parsed, autoMap(parsed.header), DEFAULTS, 'teste')
+    expect(v.errors).toEqual([])
+    expect(v.rows[0].values.enthalpy).toBeCloseTo(1.5, 12)
+    expect(v.rows[1].values.relativePressure).toBe(2.1)
+  })
+})

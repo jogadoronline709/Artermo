@@ -71,7 +71,7 @@ export function FluidPage({ fluid, refId }: Props) {
           <div className="source-meta">
             <p className="source-cite">{citation(active) || <span className="muted">Referência sem metadados.</span>}</p>
             <p className="source-facts">
-              <span className={active.pressureKPa == null ? 'warn-text' : ''}>Pressão: {pressureText(active)}</span>
+              {active.pressureApplies !== false && <span className={active.pressureKPa == null ? 'warn-text' : ''}>Pressão: {pressureText(active)}</span>}
             </p>
             {active.notes && <p className="small">{active.notes}</p>}
           </div>

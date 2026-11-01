@@ -1,6 +1,6 @@
 import type { DerivedChoice, SourceQuery } from '../domain/query'
 import type { DataRow, Source } from '../domain/types'
-import { PROPERTY_DEFS } from '../domain/units'
+import { propertyDefsFor } from '../domain/units'
 import { copyText, dateStamp, downloadText, slug } from '../lib/files'
 import { citation, fmtReqTemp, pressureText, sourceReportCsv, sourceReportText, type RequestedTemp } from '../lib/report'
 import { useFeedback } from './feedback'
@@ -43,8 +43,9 @@ export function SourceMeta({ source }: { source: Source }) {
       <p className="source-cite">{c || <span className="muted">Referência sem metadados.</span>}</p>
       <p className="source-facts">
         <span>Fluido: {source.fluid || '—'}</span>
-        <span className={source.pressureKPa == null ? 'warn-text' : ''}>Pressão: {pressureText(source)}</span>
+        {source.pressureApplies !== false && <span className={source.pressureKPa == null ? 'warn-text' : ''}>Pressão: {pressureText(source)}</span>}
       </p>
+      {source.notes && <p className="small source-notes">{source.notes}</p>}
     </div>
   )
 }
@@ -111,7 +112,7 @@ export function SourceResult({ source, rows, query, req, sig, choice, allowExtra
         <>
           <p className="print-only">T = {fmtReqTemp(req)}</p>
           <ul className="props">
-            {PROPERTY_DEFS.map((d) => (
+            {propertyDefsFor(source.propertySet).map((d) => (
               <PropertyRow key={`${source.id}-${d.key}`} def={d} r={query[d.key]} tC={req.tC} sig={sig} choice={choice} />
             ))}
           </ul>

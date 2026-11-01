@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { newSource } from '../data/defaults'
 import type { DataRow } from '../domain/types'
-import { NONE_SELECTED, selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
+import { defaultChartProp, NONE_SELECTED, selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
 
 const src = (id: string) => newSource({ id, shortName: id.toUpperCase() })
 const row = (sourceId: string): DataRow => ({ id: `${sourceId}-0`, sourceId, temperatureC: 0, originalTemperature: { value: 0, unit: 'C' }, values: { density: 1 } })
@@ -38,5 +38,13 @@ describe('seleção de referências do Comparar', () => {
 describe('seleção salva que ficou obsoleta', () => {
   it('se nenhuma referência salva existe mais, volta ao padrão', () => {
     expect(selectedCompareIds(['zz', 'yy'], sources, withData)).toEqual(['a', 'c'])
+  })
+})
+
+describe('propriedade inicial do gráfico', () => {
+  it('é a primeira propriedade do conjunto do fluido', () => {
+    expect(defaultChartProp([newSource({ id: 'g', shortName: 'G', propertySet: 'gasIdeal' })])).toBe('enthalpy')
+    expect(defaultChartProp([newSource({ id: 't', shortName: 'T' })])).toBe('density')
+    expect(defaultChartProp([])).toBe('density')
   })
 })

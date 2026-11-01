@@ -1,4 +1,5 @@
-import type { DataRow, Source } from '../domain/types'
+import type { DataRow, PropertyKey, Source } from '../domain/types'
+import { propertyDefsFor } from '../domain/units'
 
 /** Marca "o usuário desmarcou todas", diferente de "nunca escolheu" (lista vazia). */
 export const NONE_SELECTED = '__nenhuma__'
@@ -22,4 +23,9 @@ export function selectedCompareIds(saved: string[] | undefined, sources: Source[
 export function toggleCompareId(current: string[], id: string): string[] {
   const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id]
   return next.length ? next : [NONE_SELECTED]
+}
+
+/** Propriedade inicial do gráfico do Comparar: a primeira do conjunto do fluido. */
+export function defaultChartProp(sources: Source[]): PropertyKey {
+  return propertyDefsFor(sources[0]?.propertySet)[0].key
 }

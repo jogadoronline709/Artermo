@@ -1,4 +1,4 @@
-import type { PressureUnit, PropertyKey, TempUnit } from './types'
+import type { PressureUnit, PropertyKey, PropertySetId, TempUnit } from './types'
 
 /* ------------------------------------------------------------------ */
 /* Temperatura                                                         */
@@ -205,7 +205,71 @@ export const PROPERTY_DEFS: PropertyDef[] = [
     derived: true,
     units: [{ id: '-', label: '— (adimensional)', factor: 1, aliases: ['-', '', 'adim', 'adimensional', '1', 'dimensionless'] }],
   },
+  /* ---------- Gás ideal ---------- */
+  {
+    key: 'enthalpy',
+    label: 'Entalpia',
+    symbol: 'h',
+    canonical: 'kJ/kg',
+    csv: 'enthalpy',
+    csvUnit: 'enthalpy_unit',
+    units: [
+      { id: 'kJ/kg', label: 'kJ/kg', factor: 1, aliases: ['kj/kg'] },
+      { id: 'J/kg', label: 'J/kg', factor: 0.001, aliases: ['j/kg'] },
+    ],
+  },
+  {
+    key: 'internalEnergy',
+    label: 'Energia interna',
+    symbol: 'u',
+    canonical: 'kJ/kg',
+    csv: 'internal_energy',
+    csvUnit: 'internal_energy_unit',
+    units: [
+      { id: 'kJ/kg', label: 'kJ/kg', factor: 1, aliases: ['kj/kg'] },
+      { id: 'J/kg', label: 'J/kg', factor: 0.001, aliases: ['j/kg'] },
+    ],
+  },
+  {
+    key: 'entropyStd',
+    label: 'Entropia padrão',
+    symbol: 's°',
+    canonical: 'kJ/(kg·K)',
+    csv: 'entropy_std',
+    csvUnit: 'entropy_std_unit',
+    units: [
+      { id: 'kJ/(kg.K)', label: 'kJ/(kg·K)', factor: 1, aliases: ['kj/(kg.k)', 'kj/kg.k', 'kj/kgk', 'kj/(kgk)', 'kj/kg/k'] },
+      { id: 'J/(kg.K)', label: 'J/(kg·K)', factor: 0.001, aliases: ['j/(kg.k)', 'j/kg.k', 'j/kgk', 'j/(kgk)', 'j/kg/k'] },
+    ],
+  },
+  {
+    key: 'relativePressure',
+    label: 'Pressão relativa',
+    symbol: 'Pᵣ',
+    canonical: '—',
+    csv: 'relative_pressure',
+    units: [{ id: '-', label: '— (adimensional)', factor: 1, aliases: ['-', '', 'adim', 'adimensional', '1', 'dimensionless'] }],
+  },
+  {
+    key: 'relativeVolume',
+    label: 'Volume relativo',
+    symbol: 'vᵣ',
+    canonical: '—',
+    csv: 'relative_volume',
+    units: [{ id: '-', label: '— (adimensional)', factor: 1, aliases: ['-', '', 'adim', 'adimensional', '1', 'dimensionless'] }],
+  },
 ]
+
+/** Propriedades de cada conjunto, na ordem de exibição. */
+export const PROPERTY_SETS: Record<PropertySetId, PropertyKey[]> = {
+  transporte: ['density', 'specificHeat', 'conductivity', 'dynamicViscosity', 'kinematicViscosity', 'thermalDiffusivity', 'prandtl'],
+  gasIdeal: ['enthalpy', 'internalEnergy', 'entropyStd', 'relativePressure', 'relativeVolume'],
+}
+
+/** Definições das propriedades de um conjunto (padrão: transporte). */
+export function propertyDefsFor(set: PropertySetId = 'transporte'): PropertyDef[] {
+  return PROPERTY_SETS[set].map((k) => PROPERTY_DEFS.find((d) => d.key === k) as PropertyDef)
+}
 
 export const PROPERTY_KEYS: PropertyKey[] = PROPERTY_DEFS.map((d) => d.key)
 

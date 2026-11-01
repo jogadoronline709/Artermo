@@ -8,6 +8,7 @@ import {
   parseTempUnit,
   pressureFromKPa,
   pressureToKPa,
+  propertyDefsFor,
   toCanonical,
   toCelsius,
 } from '../domain/units'
@@ -111,5 +112,23 @@ describe('leitura de números (vírgula e ponto decimal)', () => {
     expect(formatNumber(1.5)).toBe('1,5000')
     expect(formatNumber(1.5e-5, { sig: 4 })).toBe('1,500 × 10⁻⁵')
     expect(formatNumber(null)).toBe('—')
+  })
+})
+
+describe('propriedades de gás ideal e conjuntos', () => {
+  it('guarda h, u e s° em kJ (unidade dos livros de termodinâmica)', () => {
+    expect(toCanonical('enthalpy', 1.5, 'kJ/kg')).toBeCloseTo(1.5, 12)
+    expect(toCanonical('enthalpy', 1500, 'J/kg')).toBeCloseTo(1.5, 12)
+    expect(toCanonical('internalEnergy', 2, 'kJ/kg')).toBeCloseTo(2, 12)
+    expect(toCanonical('entropyStd', 1.2, 'kJ/(kg.K)')).toBeCloseTo(1.2, 12)
+    expect(parsePropertyUnit('enthalpy', 'kJ/kg')).toBe('kJ/kg')
+  })
+
+  it('cada conjunto lista suas propriedades na ordem certa', () => {
+    expect(propertyDefsFor('gasIdeal').map((d) => d.key)).toEqual(['enthalpy', 'internalEnergy', 'entropyStd', 'relativePressure', 'relativeVolume'])
+    const transporte = ['density', 'specificHeat', 'conductivity', 'dynamicViscosity', 'kinematicViscosity', 'thermalDiffusivity', 'prandtl']
+    expect(propertyDefsFor('transporte').map((d) => d.key)).toEqual(transporte)
+    expect(propertyDefsFor().map((d) => d.key)).toEqual(transporte)
+    expect(propertyDefsFor('gasIdeal').map((d) => d.symbol)).toEqual(['h', 'u', 's°', 'Pᵣ', 'vᵣ'])
   })
 })

@@ -261,3 +261,13 @@ describe('compatibilidade de pressão e fluido', () => {
     expect(r.issues.map((i) => i.kind)).toContain('fluid_different')
   })
 })
+
+describe('compatibilidade quando a pressão não se aplica', () => {
+  it('fontes de gás ideal sem pressão não geram aviso', () => {
+    const r = checkCompatibility([
+      { shortName: 'A', fluid: 'Ar (gás ideal)', pressureKPa: null, pressureApplies: false },
+      { shortName: 'B', fluid: 'Ar (gás ideal)', pressureKPa: null, pressureApplies: false },
+    ])
+    expect(r).toEqual({ compatible: true, issues: [] })
+  })
+})

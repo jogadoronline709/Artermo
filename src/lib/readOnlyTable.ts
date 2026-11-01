@@ -1,6 +1,6 @@
 import { formatNumber, formatTemp } from '../domain/numbers'
 import type { DataRow, Source } from '../domain/types'
-import { fromCanonical, getUnitDef, PROPERTY_DEFS, tempUnitLabel } from '../domain/units'
+import { fromCanonical, getUnitDef, propertyDefsFor, tempUnitLabel } from '../domain/units'
 
 export interface ReadOnlyColumn {
   key: string
@@ -23,7 +23,7 @@ export interface ReadOnlyTableData {
  */
 export function buildReadOnlyTable(source: Source, rows: DataRow[], sig: number): ReadOnlyTableData {
   const showOriginal = rows.some((r) => r.originalTemperature.unit !== 'C')
-  const props = PROPERTY_DEFS.filter((d) => rows.some((r) => r.values[d.key] != null))
+  const props = propertyDefsFor(source.propertySet).filter((d) => rows.some((r) => r.values[d.key] != null))
 
   const columns: ReadOnlyColumn[] = [
     { key: 'tC', label: 'T', unit: '°C' },
