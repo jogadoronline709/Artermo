@@ -4,7 +4,7 @@
  * Cada fluido (Ar, Água a 1 atm…) tem uma lista de referências bibliográficas;
  * as tabelas vêm embutidas no app e são somente leitura.
  */
-import type { PressureUnit, PropertyUnitPrefs, TempUnit } from './types'
+import type { PressureUnit, PropertySetId, PropertyUnitPrefs, TempUnit } from './types'
 
 export type FluidCategory = 'gas' | 'liquido'
 
@@ -44,6 +44,13 @@ export interface FluidDef {
   aliases: string[]
   /** Faixa em que a condição do fluido vale; fora dela a tela mostra `message`. */
   validRange?: { minC?: number; maxC?: number; message: string }
+  /** Conjunto de propriedades das tabelas do fluido. Padrão: 'transporte'. */
+  propertySet?: PropertySetId
+  /**
+   * Se a pressão de referência importa para comparar tabelas. Padrão: true.
+   * Falso em gás ideal, cujas propriedades dependem só de T.
+   */
+  pressureApplies?: boolean
   references: ReferenceDef[]
 }
 

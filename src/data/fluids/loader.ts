@@ -25,7 +25,7 @@ export function sourceIdFor(fluidId: string, refId: string): string {
 }
 
 /** Propriedades adimensionais não precisam de unidade declarada. */
-const DIMENSIONLESS: PropertyKey[] = ['prandtl']
+const DIMENSIONLESS: PropertyKey[] = ['prandtl', 'relativePressure', 'relativeVolume']
 
 /**
  * Confere de onde vem a unidade de cada coluna (célula `*_unit`, cabeçalho ou
@@ -76,7 +76,17 @@ export function loadFluid(def: FluidDef, csvByRefId: Record<string, string | und
   def.references.forEach((ref, order) => {
     const id = sourceIdFor(def.id, ref.id)
     const { id: _refId, ...meta } = ref
-    const source = newSource({ ...meta, id, fluidId: def.id, fluid: fluidDisplayName(def), order, createdAt: '', updatedAt: '' })
+    const source = newSource({
+      ...meta,
+      id,
+      fluidId: def.id,
+      fluid: fluidDisplayName(def),
+      propertySet: def.propertySet ?? 'transporte',
+      pressureApplies: def.pressureApplies ?? true,
+      order,
+      createdAt: '',
+      updatedAt: '',
+    })
     sources.push(source)
     rowsBySource[id] = []
 

@@ -18,6 +18,8 @@ export function newSource(partial: Partial<Source> & { shortName: string }): Sou
     fluidId: partial.fluidId ?? '',
     fluid: partial.fluid ?? 'Ar',
     pressureKPa: partial.pressureKPa ?? null,
+    ...(partial.propertySet ? { propertySet: partial.propertySet } : {}),
+    ...(partial.pressureApplies != null ? { pressureApplies: partial.pressureApplies } : {}),
     pressureUnit: partial.pressureUnit ?? 'kPa',
     originalTempUnit: (partial.originalTempUnit ?? 'C') as TempUnit,
     inputUnits: partial.inputUnits ?? {},

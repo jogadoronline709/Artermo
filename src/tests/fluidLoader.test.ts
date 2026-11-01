@@ -170,3 +170,22 @@ describe('fluido de uma referência', () => {
     expect(fluidOfSourceId('nao-existe')).toBeUndefined()
   })
 })
+
+describe('conjunto de propriedades e pressão por fluido', () => {
+  const r = ref('r', { inputUnits: {} })
+  it('o fluido repassa conjunto e uso da pressão para as fontes', () => {
+    const gas = loadFluid({ ...fluid('g', [r]), propertySet: 'gasIdeal', pressureApplies: false }, {})
+    expect(gas.sources[0].propertySet).toBe('gasIdeal')
+    expect(gas.sources[0].pressureApplies).toBe(false)
+    const plain = loadFluid(fluid('p', [r]), {})
+    expect(plain.sources[0].propertySet ?? 'transporte').toBe('transporte')
+    expect(plain.sources[0].pressureApplies).not.toBe(false)
+  })
+
+  it('Pᵣ e vᵣ dispensam unidade; h sem unidade é erro', () => {
+    const ok = loadFluid(fluid('g', [r]), { r: 'temperature (K),relative_pressure,relative_volume\n300,1.5,500' })
+    expect(ok.errors).toEqual({})
+    const bad = loadFluid(fluid('g', [r]), { r: 'temperature (K),enthalpy\n300,300' })
+    expect(bad.errors['g-r'].join(' ')).toContain('h')
+  })
+})

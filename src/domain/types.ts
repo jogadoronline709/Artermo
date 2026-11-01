@@ -58,6 +58,10 @@ export interface Source {
   fluid: string
   /** Pressão de referência em kPa (canônica). `null` = não informada. */
   pressureKPa: number | null
+  /** Conjunto de propriedades da tabela (ausente = 'transporte'). */
+  propertySet?: PropertySetId
+  /** false quando a pressão de referência não se aplica (gás ideal). Ausente = true. */
+  pressureApplies?: boolean
   /** Unidade em que o usuário informou a pressão (apenas para exibição). */
   pressureUnit: PressureUnit
   /** Unidade de temperatura usada no livro (padrão para digitação e CSV). */
