@@ -17,7 +17,7 @@ function ref(id: string, extra: Partial<ReferenceDef> = {}): ReferenceDef {
     pressureKPa: null,
     pressureUnit: 'kPa',
     originalTempUnit: 'C',
-    inputUnits: {},
+    inputUnits: { density: 'kg/m3' },
     notes: '',
     ...extra,
   }
@@ -30,7 +30,7 @@ function fluid(id: string, refs: ReferenceDef[]): FluidDef {
 const CSV_K = ['temperature,density,specific_heat', '273.15,1.5,1.2', '293.15,1.4,1.3'].join('\n')
 
 describe('loadFluid', () => {
-  const def = fluid('x', [ref('r1', { originalTempUnit: 'K', inputUnits: { specificHeat: 'kJ/(kg.K)' } }), ref('r2')])
+  const def = fluid('x', [ref('r1', { originalTempUnit: 'K', inputUnits: { density: 'kg/m3', specificHeat: 'kJ/(kg.K)' } }), ref('r2')])
   const loaded = loadFluid(def, { r1: CSV_K })
 
   it('cria uma fonte por referência, com id <fluido>-<ref> e o nome exibido do fluido', () => {
@@ -72,6 +72,57 @@ describe('loadFluid', () => {
     expect(a.sources[0].id).not.toBe(b.sources[0].id)
     expect(a.rowsBySource['b-kreith']).toBeUndefined()
     expect(b.rowsBySource['b-kreith'][0].values.density).toBe(2)
+  })
+})
+
+describe('unidades das tabelas embutidas', () => {
+  // Referência sem nenhuma unidade declarada.
+  const bare = (csv: string) => {
+    const r = ref('r', { originalTempUnit: undefined, inputUnits: {} })
+    return loadFluid(fluid('u', [r]), { r: csv })
+  }
+  const errs = (l: ReturnType<typeof bare>) => (l.errors['u-r'] ?? []).join(' | ')
+
+  it('unidade de cabeçalho não reconhecida é erro, não aviso', () => {
+    const l = bare('temperature (C),dynamic_viscosity (10^-6 Pa.s)\n0,17.2')
+    expect(l.rowsBySource['u-r']).toEqual([])
+    expect(errs(l)).toContain('10^-6 Pa.s')
+  })
+
+  it('coluna não reconhecida é erro', () => {
+    const l = bare('temperature (C),density (kg/m3),thermal_difusivity\n0,1,2')
+    expect(errs(l)).toContain('thermal_difusivity')
+    expect(l.rowsBySource['u-r']).toEqual([])
+  })
+
+  it('unidade não declarada em lugar nenhum é erro (temperatura e propriedade)', () => {
+    const l = bare('temperature,density\n0,1')
+    expect(errs(l)).toMatch(/temperatura/i)
+    expect(errs(l)).toContain('ρ')
+  })
+
+  it('Pr não precisa de unidade', () => {
+    const l = bare('temperature (C),prandtl\n0,0.7')
+    expect(l.errors).toEqual({})
+    expect(l.rowsBySource['u-r'][0].values.prandtl).toBe(0.7)
+  })
+
+  it('unidade do cabeçalho vira a unidade de exibição da referência', () => {
+    const l = bare('temperature (K),dynamic_viscosity (1e-7 Pa.s)\n273.15,172')
+    expect(l.errors).toEqual({})
+    expect(l.sources[0].inputUnits.dynamicViscosity).toBe('1e-7 Pa.s')
+    expect(l.rowsBySource['u-r'][0].values.dynamicViscosity).toBeCloseTo(1.72e-5, 18)
+  })
+
+  it('unidade por linha igual em toda a coluna vira a unidade de exibição', () => {
+    const l = bare('temperature,temperature_unit,specific_heat,specific_heat_unit\n0,C,1.1,kJ/(kg.K)\n10,C,1.2,kJ/(kg.K)')
+    expect(l.errors).toEqual({})
+    expect(l.sources[0].inputUnits.specificHeat).toBe('kJ/(kg.K)')
+  })
+
+  it('unidades diferentes na mesma coluna são erro', () => {
+    const l = bare('temperature (C),specific_heat,specific_heat_unit\n0,1.1,kJ/(kg.K)\n10,1200,J/(kg.K)')
+    expect(errs(l)).toMatch(/unidades diferentes/i)
   })
 })
 

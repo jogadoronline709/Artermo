@@ -5,6 +5,9 @@
  * `CSV_HEADERS` em `src/data/csv.ts`), preencha os metadados abaixo conforme o
  * exemplar e rode `npm test`. Nenhum valor é inventado ou completado.
  *
+ * Declare a unidade de cada coluna (no cabeçalho do CSV, ex. "temperature (K)", ou em
+ * originalTempUnit/inputUnits abaixo): coluna sem unidade declarada é erro.
+ *
  * Se a tabela do livro for de líquido saturado, registre `pressureKPa: 101.325`
  * e explique a aproximação em `notes` (entre 0 e 100 °C o líquido saturado é
  * tratado como água a 1 atm).
@@ -22,7 +25,6 @@ function emptyRef(id: string, shortName: string): ReferenceDef {
     pageTable: '',
     pressureKPa: null,
     pressureUnit: 'kPa',
-    originalTempUnit: 'C',
     inputUnits: {},
     notes: '',
   }

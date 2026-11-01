@@ -20,9 +20,15 @@ export interface ReferenceDef {
   pageTable: string
   pressureKPa: number | null
   pressureUnit: PressureUnit
-  /** Unidade padrão da temperatura nas linhas do CSV. */
-  originalTempUnit: TempUnit
-  /** Unidade padrão de cada coluna do CSV. */
+  /**
+   * Unidade da temperatura no CSV, quando não vem no cabeçalho nem na coluna
+   * `temperature_unit`. Ausente e não declarada no CSV = erro de carga.
+   */
+  originalTempUnit?: TempUnit
+  /**
+   * Unidade de cada coluna do CSV, quando não vem no cabeçalho nem na coluna
+   * `*_unit`. Coluna sem unidade em lugar nenhum = erro de carga (exceto Pr).
+   */
   inputUnits: PropertyUnitPrefs
   notes: string
 }
