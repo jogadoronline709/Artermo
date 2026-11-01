@@ -3,7 +3,7 @@ import { hasValue } from '../domain/interpolation'
 import { formatNumber, formatPlain, formatTemp } from '../domain/numbers'
 import { effectiveValue, type DerivedChoice, type SourceQuery } from '../domain/query'
 import type { PropertyKey, Source, TempUnit } from '../domain/types'
-import { PROPERTY_DEFS, pressureFromKPa, tempUnitLabel } from '../domain/units'
+import { PROPERTY_DEFS, pressureFromKPa, propertyDefsFor, tempUnitLabel } from '../domain/units'
 import { findFluid } from '../data/fluids/registry'
 import { rangeWarning } from '../domain/fluids'
 
@@ -60,12 +60,12 @@ export function sourceReportText(s: Source, q: SourceQuery, t: RequestedTemp, ch
     `ArTermo — ${s.shortName}`,
     `Fluido: ${s.fluid}`,
     citation(s) || '(referência sem metadados)',
-    `Pressão de referência: ${pressureText(s)}`,
+    ...(s.pressureApplies === false ? [] : [`Pressão de referência: ${pressureText(s)}`]),
     `T = ${fmtReqTemp(t)}`,
     ...(notice ? [`AVISO: ${notice}`] : []),
     '',
   ]
-  for (const d of PROPERTY_DEFS) {
+  for (const d of propertyDefsFor(s.propertySet)) {
     const e = effectiveValue(q[d.key], d.derived ? choice : 'published')
     if (e.ok) lines.push(`${d.symbol} = ${formatNumber(e.value, { sig })} ${d.canonical} (${STATUS_TXT[e.status] ?? e.status})`)
     else lines.push(`${d.symbol}: ${e.reason}`)
@@ -89,14 +89,14 @@ export function sourceReportCsv(s: Source, q: SourceQuery, t: RequestedTemp, cho
     csvLine(['fluido', s.fluid]),
     csvLine(['fonte', s.shortName]),
     csvLine(['referencia', citation(s)]),
-    csvLine(['pressao', pressureText(s)]),
+    ...(s.pressureApplies === false ? [] : [csvLine(['pressao', pressureText(s)])]),
     csvLine(['T_solicitada', formatPlain(t.value, ','), tempUnitLabel(t.unit)]),
     csvLine(['T_C', formatPlain(t.tC, ',')]),
     ...(notice ? [csvLine(['aviso', notice])] : []),
     '',
     csvLine(['propriedade', 'simbolo', 'valor', 'unidade', 'situacao', 'T1_C', 'y1', 'T2_C', 'y2', 'fracao', 'publicado', 'calculado']),
   ]
-  for (const d of PROPERTY_DEFS) {
+  for (const d of propertyDefsFor(s.propertySet)) {
     const r = q[d.key]
     const e = effectiveValue(r, d.derived ? choice : 'published')
     const p = r.published

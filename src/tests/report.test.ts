@@ -1,5 +1,6 @@
 // ATENÇÃO: todos os números deste arquivo são DADOS SINTÉTICOS DE TESTE.
 import { describe, expect, it } from 'vitest'
+import { newSource } from '../data/defaults'
 import { getFluid } from '../data/fluids/registry'
 import { querySource } from '../domain/query'
 import { compareReportCsv, fluidRangeNotice, missingTableLabel, pressureText, sourceReportCsv, sourceReportText, type RequestedTemp } from '../lib/report'
@@ -50,5 +51,28 @@ describe('textos sem "cadastrado"', () => {
     expect(missingTableLabel(['Linha 2 — erro'])).toBe('Tabela com erro')
     expect(missingTableLabel(undefined)).toBe('Tabela vazia')
     expect(missingTableLabel([])).toBe('Tabela vazia')
+  })
+})
+
+describe('relatórios de gás ideal', () => {
+  const gas = newSource({ id: 'g', shortName: 'G', fluidId: 'x', fluid: 'Ar (gás ideal)', propertySet: 'gasIdeal', pressureApplies: false })
+  it('sem linha de pressão e só com propriedades do conjunto', () => {
+    const txt = sourceReportText(gas, q(25), at(25), 'published', 4)
+    expect(txt).not.toContain('Pressão de referência')
+    expect(txt).toContain('h:')
+    expect(txt).not.toContain('ρ')
+    const csv = sourceReportCsv(gas, q(25), at(25), 'published')
+    expect(csv).not.toContain('pressao;')
+    expect(csv).toContain('Entalpia')
+    expect(csv).not.toContain('Massa específica')
+  })
+
+  it('fontes de transporte mantêm a linha de pressão', () => {
+    expect(sourceReportText(src, q(50), at(50), 'published', 4)).toContain('Pressão de referência')
+  })
+
+  it('CSV da comparação só tem linhas do conjunto', () => {
+    const csv = compareReportCsv(at(25), [gas], [], 'Exigir todas', '')
+    expect(csv).toContain('fluido;Ar (gás ideal)')
   })
 })

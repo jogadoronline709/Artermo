@@ -4,9 +4,9 @@ import { checkCompatibility } from '../domain/compatibility'
 import { formatNumber } from '../domain/numbers'
 import { effectiveValue, type DerivedChoice, type SourceQuery } from '../domain/query'
 import type { DataRow, PropertyKey, Source, TempUnit } from '../domain/types'
-import { PROPERTY_DEFS } from '../domain/units'
+import { PROPERTY_DEFS, propertyDefsFor } from '../domain/units'
 import { useSettings } from '../hooks/settingsContext'
-import { selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
+import { defaultChartProp, selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
 import { copyText, dateStamp, downloadText } from '../lib/files'
 import { compareReportCsv, fluidRangeNotice, fmtReqTemp, missingTableLabel, type CompareRow, type RequestedTemp } from '../lib/report'
 import { useFeedback } from './feedback'
@@ -41,7 +41,10 @@ export function ComparePanel({ fluidId, loadErrors, sources, rowsBySource, queri
   const { settings, update } = useSettings()
   const { confirm, toast } = useFeedback()
   const [override, setOverride] = useState(false)
-  const [chartProp, setChartProp] = useState<PropertyKey>('density')
+  const setDefs = propertyDefsFor(sources[0]?.propertySet)
+  const [chosenChartProp, setChartProp] = useState<PropertyKey>(() => defaultChartProp(sources))
+  // Ao trocar de fluido, a propriedade escolhida pode não existir no novo conjunto.
+  const chartProp = setDefs.some((d) => d.key === chosenChartProp) ? chosenChartProp : defaultChartProp(sources)
   const [showChart, setShowChart] = useState(false)
   const sig = settings.sigDigits
 
@@ -60,7 +63,7 @@ export function ComparePanel({ fluidId, loadErrors, sources, rowsBySource, queri
 
   const table: (CompareRow & { cells: Cell[] })[] = !req
     ? []
-    : PROPERTY_DEFS.map((d) => {
+    : setDefs.map((d) => {
       const cells: Cell[] = selected.map((s) => {
         const rows = rowsBySource[s.id] ?? []
         if (rows.length === 0) return { name: s.shortName, value: null, kind: 'missing', label: missingTableLabel(loadErrors?.[s.id]) }
@@ -353,7 +356,7 @@ export function ComparePanel({ fluidId, loadErrors, sources, rowsBySource, queri
               </button>
               {showChart && (
                 <select aria-label="Propriedade do gráfico" value={chartProp} onChange={(e) => setChartProp(e.target.value as PropertyKey)}>
-                  {PROPERTY_DEFS.map((d) => (
+                  {setDefs.map((d) => (
                     <option key={d.key} value={d.key}>
                       {d.symbol} — {d.label}
                     </option>
