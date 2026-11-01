@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>ArTermo — Propriedades do Ar</title>
+    <meta name="description" content="Consulte, interpole e compare propriedades do ar a partir das suas tabelas de Kreith, Incropera e Çengel. Funciona offline." />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#162029" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="ArTermo" />
+    <script>
+      // Aplica o tema salvo antes da primeira pintura (evita piscar).
+      try {
+        var t = localStorage.getItem('artermo-theme')
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t)
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>O ArTermo precisa de JavaScript ativado.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
