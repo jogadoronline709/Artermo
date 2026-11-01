@@ -139,7 +139,7 @@ Preservar a separação entre lógica de cálculo, dados e interface.
 1. **Fluido novo:** crie `src/data/fluids/<id>/fluid.ts` exportando um `FluidDef` (id, nome, condição, categoria, apelidos de busca, faixa válida se houver, referências). Copie `agua/fluid.ts` como modelo.
 2. Inclua o fluido em `FLUID_DEFS`, em `src/data/fluids/registry.ts` (a ordem da lista é a ordem de exibição).
 3. **Tabela de uma referência:** crie `src/data/fluids/<id>/<refId>.csv` (ex.: `agua/kreith.csv`) com os cabeçalhos de `CSV_HEADERS` (`src/data/csv.ts`). Copie os números exatamente como fornecidos; use `#` no topo para citar a fonte.
-4. Preencha no `ReferenceDef` os metadados conforme informados pelo dono: autores, título, edição, ano, página/tabela, pressão de referência, unidade de temperatura e unidades das colunas.
+4. Preencha no `ReferenceDef` os metadados conforme informados pelo dono: autores, título, edição, ano, página/tabela e pressão de referência. **Toda coluna precisa de unidade declarada** — no cabeçalho do CSV (ex.: `temperature (K)`, `dynamic_viscosity (1e-7 Pa.s)`), na coluna `*_unit` ou em `originalTempUnit`/`inputUnits` da referência. Coluna sem unidade, unidade não reconhecida, coluna desconhecida ou unidades diferentes na mesma coluna são erro de carga (só Pr dispensa unidade). A tabela é exibida na unidade declarada de cada coluna.
 5. Se o livro usar uma escala de unidade que falte (ex.: μ em 10⁻⁶ Pa·s, α em 10⁻⁷ m²/s), adicione-a em `src/domain/units.ts` com teste em `units.test.ts`.
 6. Rode `npm run check`. O teste "todas as tabelas embutidas são válidas" falha se houver qualquer erro de validação ou CSV sem fluido/referência correspondente.
 
