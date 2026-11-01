@@ -69,7 +69,7 @@ export function QueryPage({ fluid, temp, tab }: Props) {
           <section className="panel onboarding">
             <h2>Sem dados ainda</h2>
             <p>Os dados de {fluidDisplayName(fluid.def)} ainda não foram incluídos nesta versão do app.</p>
-            <a className="btn" href="#/fluidos">
+            <a className="btn" href={href({ page: 'fluidos' })}>
               Ver outros fluidos
             </a>
           </section>

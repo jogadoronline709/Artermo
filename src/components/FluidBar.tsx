@@ -1,5 +1,6 @@
 import type { LoadedFluid } from '../data/fluids/registry'
 import { fluidDisplayName, rangeWarning } from '../domain/fluids'
+import { href } from '../hooks/useRoute'
 
 interface Props {
   fluid: LoadedFluid
@@ -14,7 +15,7 @@ export function FluidBar({ fluid, tC }: Props) {
     <div className="fluid-bar">
       <p className="fluid-bar-name">
         Fluido: <strong>{fluidDisplayName(fluid.def)}</strong>
-        <a className="fluid-bar-change" href="#/fluidos">
+        <a className="fluid-bar-change" href={href({ page: 'fluidos' })}>
           trocar
         </a>
       </p>

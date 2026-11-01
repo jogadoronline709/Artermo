@@ -3,20 +3,20 @@ import { parseNumber } from './domain/numbers'
 import type { TempUnit } from './domain/types'
 import { ABSOLUTE_ZERO_C, toCelsius } from './domain/units'
 import { useFeedback } from './components/feedback'
-import { getFluid } from './data/fluids/registry'
+import { findFluid, FLUIDS, getFluid } from './data/fluids/registry'
 import { useSettings } from './hooks/settingsContext'
 import { repo, useRowsBySource, useSources } from './hooks/useData'
 import { useOnline } from './hooks/usePlatform'
 import { href, useRoute, type Route } from './hooks/useRoute'
-import { LibraryPage } from './pages/LibraryPage'
+import { FluidPage } from './pages/FluidPage'
+import { FluidsPage } from './pages/FluidsPage'
 import { QueryPage, type TempState } from './pages/QueryPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { SourceEditorPage } from './pages/SourceEditorPage'
 
 const NAV: { page: Route['page']; label: string; icon: string }[] = [
   { page: 'consultar', label: 'Consultar', icon: 'M4 18h16M7 18V9m5 9V5m5 13v-6' },
   { page: 'comparar', label: 'Comparar', icon: 'M5 7h14M5 12h14M5 17h14M9 4v16M15 4v16' },
-  { page: 'biblioteca', label: 'Biblioteca', icon: 'M5 4h4v16H5zM10 4h4v16h-4zM15.5 5l3.6-.9 3.7 15.1-3.6.9z' },
+  { page: 'fluidos', label: 'Gases/Fluidos', icon: 'M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z' },
   { page: 'config', label: 'Configurações', icon: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm8 3-2-.6-.6-1.5 1-1.9-1.4-1.4-1.9 1-1.5-.6L13 4h-2l-.6 2-1.5.6-1.9-1-1.4 1.4 1 1.9L6 10.4 4 11v2l2 .6.6 1.5-1 1.9 1.4 1.4 1.9-1 1.5.6.6 2h2l.6-2 1.5-.6 1.9 1 1.4-1.4-1-1.9.6-1.5 2-.6z' },
 ]
 
@@ -77,20 +77,20 @@ export default function App() {
   if (route.page === 'consultar' || route.page === 'comparar') {
     const tab = route.page === 'comparar' ? 'comparar' : (route.tab ?? fluid.sources[0]?.id ?? 'comparar')
     content = <QueryPage fluid={fluid} temp={temp} tab={tab} />
-  } else if (loading) content = <p className="muted pad">Abrindo dados locais…</p>
-  else if (route.page === 'biblioteca') {
-    const src = route.sourceId ? sources.find((s) => s.id === route.sourceId) : undefined
-    if (route.sourceId && !src)
+  } else if (route.page === 'fluidos') {
+    const f = route.fluidId ? findFluid(route.fluidId) : undefined
+    if (route.fluidId && !f)
       content = (
         <div className="page">
-          <p className="empty-title">Referência não encontrada.</p>
-          <a className="btn" href={href({ page: 'biblioteca' })}>
-            Voltar à Biblioteca
+          <p className="empty-title">Fluido não encontrado.</p>
+          <a className="btn" href={href({ page: 'fluidos' })}>
+            Ver todos os fluidos
           </a>
         </div>
       )
-    else content = src ? <SourceEditorPage source={src} rows={rowsBySource[src.id] ?? []} /> : <LibraryPage sources={sources} rowsBySource={rowsBySource} />
-  } else content = <SettingsPage sources={sources} />
+    else content = f ? <FluidPage key={f.def.id} fluid={f} refId={route.refId} /> : <FluidsPage fluids={FLUIDS} />
+  } else if (loading) content = <p className="muted pad">Abrindo dados locais…</p>
+  else content = <SettingsPage sources={sources} />
 
   return (
     <div className="app">
