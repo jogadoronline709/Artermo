@@ -40,7 +40,9 @@ export interface Source {
   year: string
   /** Página e/ou número da tabela, como o usuário quiser registrar. */
   pageTable: string
-  /** Fluido da tabela. Padrão "Ar". */
+  /** Id do fluido no registro (ex.: "agua"). */
+  fluidId: string
+  /** Nome exibido do fluido da tabela (ex.: "Água (1 atm)"). */
   fluid: string
   /** Pressão de referência em kPa (canônica). `null` = não cadastrada. */
   pressureKPa: number | null

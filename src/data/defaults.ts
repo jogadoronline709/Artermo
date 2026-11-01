@@ -18,6 +18,7 @@ export function newSource(partial: Partial<Source> & { shortName: string }): Sou
     edition: partial.edition ?? '',
     year: partial.year ?? '',
     pageTable: partial.pageTable ?? '',
+    fluidId: partial.fluidId ?? '',
     fluid: partial.fluid ?? 'Ar',
     pressureKPa: partial.pressureKPa ?? null,
     pressureUnit: partial.pressureUnit ?? 'kPa',

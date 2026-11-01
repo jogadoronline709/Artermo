@@ -92,6 +92,7 @@ export function parseBackup(text: string): ParseBackupResult {
       edition: str(s.edition, 200),
       year: str(s.year, 50),
       pageTable: str(s.pageTable, 500),
+      fluidId: '',
       fluid: str(s.fluid, 100) || 'Ar',
       pressureKPa: finite(s.pressureKPa) && s.pressureKPa > 0 ? s.pressureKPa : null,
       pressureUnit: PRESSURE_UNITS.some((p) => p.id === s.pressureUnit) ? (s.pressureUnit as PressureUnit) : 'kPa',
