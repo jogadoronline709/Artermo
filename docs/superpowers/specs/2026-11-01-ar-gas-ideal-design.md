@@ -10,9 +10,9 @@ conjunto de propriedades diferente do Ar e da Água:
 
 | Propriedade | Símbolo | Unidade no livro | Unidade canônica (SI) |
 |---|---|---|---|
-| Entalpia | h | kJ/kg | J/kg |
-| Energia interna | u | kJ/kg | J/kg |
-| Entropia padrão | s° | kJ/(kg·K) | J/(kg·K) |
+| Entalpia | h | kJ/kg | kJ/kg |
+| Energia interna | u | kJ/kg | kJ/kg |
+| Entropia padrão | s° | kJ/(kg·K) | kJ/(kg·K) |
 | Pressão relativa | Pᵣ | — | — |
 | Volume relativo | vᵣ | — | — |
 

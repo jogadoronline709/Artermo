@@ -1,6 +1,6 @@
 # ArTermo — Propriedades Termofísicas
 
-Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTermo traz embutidas as tabelas de propriedades de gases e fluidos — **Ar** e **Água (1 atm)**, cada um com as referências Kreith, Incropera e Çengel — e:
+Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTermo traz embutidas as tabelas de propriedades de gases e fluidos — **Ar** e **Água (1 atm)**, cada um com as referências Kreith, Incropera e Çengel, e **Ar (gás ideal)**, com a Tabela A-17 do Çengel (h, u, s°, pressão relativa e volume relativo, de 200 a 2.250 K) — e:
 
 - interpola linearmente cada propriedade, em cada referência, para a temperatura pedida (°C, K ou °F);
 - mostra **como foi calculado** — fórmula, pontos T₁/y₁ e T₂/y₂, fração e resultado;
@@ -88,6 +88,11 @@ Unidades aceitas:
 | μ | Pa·s | mPa·s, μPa·s, 10⁻⁵ Pa·s, 10⁻⁷ Pa·s (N·s/m²) |
 | ν, α | m²/s | mm²/s, cm²/s, 10⁻⁵ m²/s, 10⁻⁶ m²/s |
 | Pr | — | — |
+| h, u (gás ideal) | kJ/kg | J/kg |
+| s° (gás ideal) | kJ/(kg·K) (no cabeçalho, escreva `kJ/kg.K`) | J/(kg·K) |
+| Pᵣ, vᵣ (gás ideal) | — | — |
+
+**Tabelas de gás ideal** (fluido com `propertySet: 'gasIdeal'`) usam os cabeçalhos `temperature`, `enthalpy`, `internal_energy`, `entropy_std`, `relative_pressure` e `relative_volume`. Atenção: a coluna "Pr" dessas tabelas é a **pressão relativa** (`relative_pressure`); o cabeçalho `pr` é lido como número de Prandtl. A Tabela A-17 embutida é conferida por teste com as relações h − u = R·T, vᵣ·Pᵣ/T constante e Δs° = R·ln(Pᵣ₂/Pᵣ₁); os 5 pontos em que a tabela impressa foge dessas relações (550, 630, 820, 1040 e 1800 K) foram mantidos como no livro e aparecem nas observações da referência.
 
 O passo a passo para incluir um fluido ou uma tabela está no [`CLAUDE.md`](CLAUDE.md), seção "Como adicionar um fluido ou uma tabela".
 
