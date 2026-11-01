@@ -21,6 +21,18 @@ export type PropertyKey =
   | 'kinematicViscosity'
   | 'thermalDiffusivity'
   | 'prandtl'
+  // Gás ideal (ex.: Çengel, Tabela A-17)
+  | 'enthalpy'
+  | 'internalEnergy'
+  | 'entropyStd'
+  | 'relativePressure'
+  | 'relativeVolume'
+
+/**
+ * Conjunto de propriedades de uma tabela: transporte (ρ, cp, k, μ, ν, α, Pr) ou
+ * gás ideal (h, u, s°, Pᵣ, vᵣ).
+ */
+export type PropertySetId = 'transporte' | 'gasIdeal'
 
 /** Propriedades que podem ser publicadas na tabela e também calculadas pelo app. */
 export type DerivedKey = 'kinematicViscosity' | 'thermalDiffusivity' | 'prandtl'
