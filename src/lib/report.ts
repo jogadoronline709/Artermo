@@ -4,6 +4,14 @@ import { formatNumber, formatPlain, formatTemp } from '../domain/numbers'
 import { effectiveValue, type DerivedChoice, type SourceQuery } from '../domain/query'
 import type { PropertyKey, Source, TempUnit } from '../domain/types'
 import { PROPERTY_DEFS, pressureFromKPa, tempUnitLabel } from '../domain/units'
+import { findFluid } from '../data/fluids/registry'
+import { rangeWarning } from '../domain/fluids'
+
+/** Alerta de faixa válida do fluido para a temperatura (vazio se não houver). */
+export function fluidRangeNotice(fluidId: string, tC: number): string {
+  const f = findFluid(fluidId)
+  return f ? (rangeWarning(f.def, tC) ?? '') : ''
+}
 
 export interface RequestedTemp {
   value: number
@@ -42,11 +50,14 @@ const STATUS_TXT: Record<string, string> = {
 }
 
 export function sourceReportText(s: Source, q: SourceQuery, t: RequestedTemp, choice: DerivedChoice, sig: number): string {
+  const notice = fluidRangeNotice(s.fluidId, t.tC)
   const lines = [
     `ArTermo — ${s.shortName}`,
+    `Fluido: ${s.fluid}`,
     citation(s) || '(referência sem metadados cadastrados)',
     `Pressão de referência: ${pressureText(s)}`,
     `T = ${fmtReqTemp(t)}`,
+    ...(notice ? [`AVISO: ${notice}`] : []),
     '',
   ]
   for (const d of PROPERTY_DEFS) {
@@ -68,12 +79,15 @@ function csvLine(cells: (string | number)[]): string {
 
 /** CSV (separador ; e vírgula decimal, para Excel pt-BR) com o detalhamento da interpolação. */
 export function sourceReportCsv(s: Source, q: SourceQuery, t: RequestedTemp, choice: DerivedChoice): string {
+  const notice = fluidRangeNotice(s.fluidId, t.tC)
   const out = [
+    csvLine(['fluido', s.fluid]),
     csvLine(['fonte', s.shortName]),
     csvLine(['referencia', citation(s)]),
     csvLine(['pressao', pressureText(s)]),
     csvLine(['T_solicitada', formatPlain(t.value, ','), tempUnitLabel(t.unit)]),
     csvLine(['T_C', formatPlain(t.tC, ',')]),
+    ...(notice ? [csvLine(['aviso', notice])] : []),
     '',
     csvLine(['propriedade', 'simbolo', 'valor', 'unidade', 'situacao', 'T1_C', 'y1', 'T2_C', 'y2', 'fracao', 'publicado', 'calculado']),
   ]
@@ -109,11 +123,14 @@ export interface CompareRow {
 }
 
 export function compareReportCsv(t: RequestedTemp, sources: Source[], rows: CompareRow[], modeLabel: string, warning: string): string {
+  const notice = sources[0] ? fluidRangeNotice(sources[0].fluidId, t.tC) : ''
   const out = [
     csvLine(['ArTermo — comparação e média aritmética das referências']),
+    ...(sources[0] ? [csvLine(['fluido', sources[0].fluid])] : []),
     csvLine(['T_solicitada', formatPlain(t.value, ','), tempUnitLabel(t.unit)]),
     csvLine(['T_C', formatPlain(t.tC, ',')]),
     csvLine(['modo', modeLabel]),
+    ...(notice ? [csvLine(['aviso', notice])] : []),
     ...(warning ? [csvLine(['aviso', warning])] : []),
     '',
     csvLine(['propriedade', 'unidade', ...sources.map((s) => s.shortName), 'media_aritmetica', 'n', 'total', 'minimo', 'maximo', 'amplitude', 'desvio_padrao_amostral', 'excluidas']),

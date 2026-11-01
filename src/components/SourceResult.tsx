@@ -94,7 +94,7 @@ export function SourceResult({ source, rows, query, req, sig, choice, allowExtra
             <button
               type="button"
               className="btn btn-small"
-              onClick={() => downloadText(`artermo-${slug(source.shortName)}-${formatTemp(req.tC).replace(',', '_')}C-${dateStamp()}.csv`, sourceReportCsv(source, query, req, choice), 'text/csv;charset=utf-8')}
+              onClick={() => downloadText(`artermo-${source.fluidId}-${slug(source.shortName)}-${formatTemp(req.tC).replace(',', '_')}C-${dateStamp()}.csv`, sourceReportCsv(source, query, req, choice), 'text/csv;charset=utf-8')}
             >
               Exportar CSV
             </button>

@@ -8,7 +8,7 @@ import { PROPERTY_DEFS } from '../domain/units'
 import { useSettings } from '../hooks/settingsContext'
 import { selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
 import { copyText, dateStamp, downloadText } from '../lib/files'
-import { compareReportCsv, fmtReqTemp, type CompareRow, type RequestedTemp } from '../lib/report'
+import { compareReportCsv, fluidRangeNotice, fmtReqTemp, type CompareRow, type RequestedTemp } from '../lib/report'
 import { useFeedback } from './feedback'
 import { Badge, type BadgeKind } from './PropertyRow'
 
@@ -107,7 +107,9 @@ export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, uni
               type="button"
               className="btn btn-small"
               onClick={async () => {
-                const lines = [`ArTermo — comparação em T = ${fmtReqTemp(req)}`, `Modo: ${MODE_LABEL[settings.averageMode]}`]
+                const lines = [`ArTermo — comparação em T = ${fmtReqTemp(req)}`, `Fluido: ${sources[0]?.fluid ?? '—'}`, `Modo: ${MODE_LABEL[settings.averageMode]}`]
+                const notice = fluidRangeNotice(fluidId, req.tC)
+                if (notice) lines.push(`AVISO: ${notice}`)
                 if (warning) lines.push(`AVISO: ${warning}`)
                 for (const r of table) {
                   const d = PROPERTY_DEFS.find((x) => x.key === r.key)!
@@ -126,7 +128,7 @@ export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, uni
               className="btn btn-small"
               onClick={() =>
                 downloadText(
-                  `artermo-comparacao-${dateStamp()}.csv`,
+                  `artermo-${fluidId}-comparacao-${dateStamp()}.csv`,
                   compareReportCsv(
                     req,
                     selected,
