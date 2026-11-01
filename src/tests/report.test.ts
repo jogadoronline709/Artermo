@@ -76,3 +76,14 @@ describe('relatórios de gás ideal', () => {
     expect(csv).toContain('fluido;Ar (gás ideal)')
   })
 })
+
+describe('observações da referência nos relatórios', () => {
+  const noted = newSource({ id: 'n', shortName: 'N', fluidId: 'x', fluid: 'X', propertySet: 'gasIdeal', pressureApplies: false, notes: 'Valor impresso suspeito em 550 K.' })
+  it('texto copiado e CSV levam as observações', () => {
+    expect(sourceReportText(noted, q(25), at(25), 'published', 4)).toContain('Observações: Valor impresso suspeito em 550 K.')
+    expect(sourceReportCsv(noted, q(25), at(25), 'published')).toContain('observacoes;Valor impresso suspeito em 550 K.')
+  })
+  it('sem observações, nenhuma linha extra', () => {
+    expect(sourceReportText(src, q(50), at(50), 'published', 4)).not.toContain('Observações')
+  })
+})

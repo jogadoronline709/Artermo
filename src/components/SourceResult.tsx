@@ -45,6 +45,7 @@ export function SourceMeta({ source }: { source: Source }) {
         <span>Fluido: {source.fluid || '—'}</span>
         {source.pressureApplies !== false && <span className={source.pressureKPa == null ? 'warn-text' : ''}>Pressão: {pressureText(source)}</span>}
       </p>
+      {source.notes && <p className="small source-notes">{source.notes}</p>}
     </div>
   )
 }

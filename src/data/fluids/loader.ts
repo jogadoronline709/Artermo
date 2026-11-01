@@ -8,7 +8,7 @@
  */
 import type { DataRow, PropertyKey, PropertyUnitPrefs, Source } from '../../domain/types'
 import { fluidDisplayName, type FluidDef, type ReferenceDef } from '../../domain/fluids'
-import { getPropertyDef, parsePropertyUnit, parseTempUnit, PROPERTY_KEYS } from '../../domain/units'
+import { getPropertyDef, parsePropertyUnit, parseTempUnit, PROPERTY_KEYS, PROPERTY_SETS } from '../../domain/units'
 import { autoMap, headerUnit, parseCsv, validateImport, type ColumnMapping, type FieldId, type ParsedCsv } from '../csv'
 import { newSource } from '../defaults'
 
@@ -31,7 +31,7 @@ const DIMENSIONLESS: PropertyKey[] = ['prandtl', 'relativePressure', 'relativeVo
  * Confere de onde vem a unidade de cada coluna (célula `*_unit`, cabeçalho ou
  * referência) e devolve a unidade de exibição de cada propriedade.
  */
-function checkUnits(parsed: ParsedCsv, map: ColumnMapping, ref: ReferenceDef): { inputUnits: PropertyUnitPrefs; errors: string[] } {
+function checkUnits(parsed: ParsedCsv, map: ColumnMapping, ref: ReferenceDef, def: FluidDef): { inputUnits: PropertyUnitPrefs; errors: string[] } {
   const errors: string[] = []
   const inputUnits: PropertyUnitPrefs = {}
   const mapped = new Set(Object.values(map))
@@ -43,6 +43,14 @@ function checkUnits(parsed: ParsedCsv, map: ColumnMapping, ref: ReferenceDef): {
   parsed.header.forEach((h, i) => {
     if (h.trim() && !mapped.has(i)) errors.push(`Coluna "${h.trim()}" não reconhecida.`)
   })
+
+  // Coluna reconhecida, mas de outro conjunto de propriedades (ex.: "Pr" numa tabela de gás ideal seria Prandtl).
+  const set = def.propertySet ?? 'transporte'
+  for (const k of PROPERTY_KEYS) {
+    if (map[k] == null || PROPERTY_SETS[set].includes(k)) continue
+    const hint = k === 'prandtl' && set === 'gasIdeal' ? ' Para a pressão relativa (Pᵣ), use o cabeçalho relative_pressure.' : ''
+    errors.push(`Coluna "${parsed.header[map[k] as number].trim()}" (${getPropertyDef(k).label}) não pertence às propriedades deste fluido.${hint}`)
+  }
 
   if (map.temperature != null) {
     const hdr = parseTempUnit(headerUnit(parsed.header[map.temperature] ?? ''))
@@ -95,7 +103,7 @@ export function loadFluid(def: FluidDef, csvByRefId: Record<string, string | und
     try {
       const parsed = parseCsv(csv)
       const map = autoMap(parsed.header)
-      const units = checkUnits(parsed, map, ref)
+      const units = checkUnits(parsed, map, ref, def)
       const v = validateImport(parsed, map, { tempUnit: ref.originalTempUnit ?? 'C', units: ref.inputUnits }, id)
       const issues = [...units.errors, ...[...v.errors, ...v.warnings].map((e) => `Linha ${e.line} — ${e.field ? `${e.field}: ` : ''}${e.message}`)]
       if (issues.length) {
