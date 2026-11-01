@@ -7,12 +7,11 @@
  * - Linhas iniciadas por "#" são comentários e são ignoradas.
  * - Conteúdo do arquivo é tratado apenas como texto/número — nunca executado.
  */
-import { parseNumber, formatPlain } from '../domain/numbers'
+import { parseNumber } from '../domain/numbers'
 import { TEMP_TOLERANCE_C } from '../domain/interpolation'
-import type { DataRow, PropertyKey, PropertyUnitPrefs, Source, TempUnit } from '../domain/types'
+import type { DataRow, PropertyKey, PropertyUnitPrefs, TempUnit } from '../domain/types'
 import {
   ABSOLUTE_ZERO_C,
-  fromCanonical,
   getPropertyDef,
   getUnitDef,
   parsePropertyUnit,
@@ -24,7 +23,6 @@ import {
 } from '../domain/units'
 
 /** Tamanho máximo aceito para arquivos importados (CSV). */
-export const MAX_CSV_BYTES = 2 * 1024 * 1024
 export const MAX_CSV_ROWS = 5000
 
 export type Delimiter = ',' | ';' | '\t'
@@ -336,40 +334,7 @@ export function validateImport(parsed: ParsedCsv, mapping: ColumnMapping, defaul
   return { rows, errors, warnings }
 }
 
-/* ------------------------------------------------------------------ */
-/* Mesclagem com a tabela existente                                    */
-/* ------------------------------------------------------------------ */
-
-export type MergeMode = 'replace' | 'upsert'
-
-/**
- * replace: a tabela passa a ser exatamente o conteúdo importado.
- * upsert: mantém as linhas existentes, substitui as de mesma temperatura e acrescenta as novas.
- */
-export function mergeRows(existing: DataRow[], incoming: DataRow[], mode: MergeMode): { rows: DataRow[]; replaced: number; added: number } {
-  if (mode === 'replace') return { rows: [...incoming].sort(byT), replaced: 0, added: incoming.length }
-  const result = [...existing]
-  let replaced = 0
-  let added = 0
-  for (const r of incoming) {
-    const i = result.findIndex((e) => Math.abs(e.temperatureC - r.temperatureC) <= TEMP_TOLERANCE_C)
-    if (i >= 0) {
-      result[i] = { ...r, id: result[i].id }
-      replaced++
-    } else {
-      result.push(r)
-      added++
-    }
-  }
-  return { rows: result.sort(byT), replaced, added }
-}
-
-const byT = (a: DataRow, b: DataRow) => a.temperatureC - b.temperatureC
-
-/* ------------------------------------------------------------------ */
-/* Exportação                                                          */
-/* ------------------------------------------------------------------ */
-
+/** Cabeçalhos do formato CSV das tabelas embutidas. */
 export const CSV_HEADERS = [
   'temperature',
   'temperature_unit',
@@ -387,81 +352,3 @@ export const CSV_HEADERS = [
   'thermal_diffusivity',
   'thermal_diffusivity_unit',
 ]
-
-const CSV_FIELD_ORDER: FieldId[] = [
-  'temperature',
-  'temperature_unit',
-  'density',
-  'density_unit',
-  'specificHeat',
-  'specificHeat_unit',
-  'conductivity',
-  'conductivity_unit',
-  'dynamicViscosity',
-  'dynamicViscosity_unit',
-  'prandtl',
-  'kinematicViscosity',
-  'kinematicViscosity_unit',
-  'thermalDiffusivity',
-  'thermalDiffusivity_unit',
-]
-
-function quote(cell: string, delimiter: Delimiter): string {
-  if (cell.includes(delimiter) || cell.includes('"') || cell.includes('\n')) return `"${cell.replace(/"/g, '""')}"`
-  return cell
-}
-
-export function tempUnitCsv(u: TempUnit): string {
-  return u === 'C' ? 'C' : u === 'K' ? 'K' : 'F'
-}
-
-/**
- * Exporta a tabela de UMA fonte. Valores na unidade preferida da fonte
- * (a mesma do livro), com coluna de unidade explícita em cada linha.
- * delimiter ";" usa vírgula decimal (Excel em pt-BR); "," usa ponto decimal.
- */
-export function exportSourceCsv(source: Source, rows: DataRow[], delimiter: ',' | ';' = ','): string {
-  const dec = delimiter === ';' ? ',' : '.'
-  const lines = [CSV_HEADERS.join(delimiter)]
-  for (const r of [...rows].sort(byT)) {
-    const cells = CSV_FIELD_ORDER.map((f): string => {
-      if (f === 'temperature') return formatPlain(r.originalTemperature.value, dec)
-      if (f === 'temperature_unit') return tempUnitCsv(r.originalTemperature.unit)
-      if (f.endsWith('_unit')) {
-        const k = f.replace('_unit', '') as PropertyKey
-        if (r.values[k] == null) return ''
-        return getUnitDef(k, source.inputUnits[k]).id
-      }
-      const k = f as PropertyKey
-      const v = r.values[k]
-      if (v == null) return ''
-      return formatPlain(roundSig(fromCanonical(k, v, source.inputUnits[k]), 12), dec)
-    })
-    lines.push(cells.map((c) => quote(c, delimiter)).join(delimiter))
-  }
-  return lines.join('\r\n') + '\r\n'
-}
-
-/** Remove ruído de ponto flutuante (ex.: 0.30000000000000004 → 0.3). */
-export function roundSig(v: number, sig: number): number {
-  if (v === 0 || !Number.isFinite(v)) return v
-  return Number(v.toPrecision(sig))
-}
-
-/** Modelo CSV vazio com instruções em linhas de comentário (#). */
-export function csvTemplate(): string {
-  const units = PROPERTY_DEFS.filter((d) => d.csvUnit)
-    .map((d) => `#   ${d.csv}_unit (${d.symbol}): ${d.units.map((u) => u.id).join(' | ')}`)
-    .join('\n')
-  return [
-    '# ArTermo — modelo de importação (linhas iniciadas por # são ignoradas)',
-    '# Digite os valores do SEU exemplar. Célula vazia = dado ausente (nunca use 0).',
-    '# Separador: vírgula ou ponto e vírgula. Decimal: ponto ou vírgula.',
-    '# Com separador vírgula, números com vírgula decimal precisam estar entre aspas.',
-    '# As colunas *_unit podem ficar vazias: valem as unidades configuradas na fonte.',
-    '# temperature_unit: C | K | F',
-    units,
-    CSV_HEADERS.join(','),
-    '',
-  ].join('\n')
-}

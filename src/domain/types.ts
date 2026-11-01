@@ -40,7 +40,9 @@ export interface Source {
   year: string
   /** Página e/ou número da tabela, como o usuário quiser registrar. */
   pageTable: string
-  /** Fluido da tabela. Padrão "Ar". */
+  /** Id do fluido no registro (ex.: "agua"). */
+  fluidId: string
+  /** Nome exibido do fluido da tabela (ex.: "Água (1 atm)"). */
   fluid: string
   /** Pressão de referência em kPa (canônica). `null` = não cadastrada. */
   pressureKPa: number | null
@@ -51,8 +53,6 @@ export interface Source {
   /** Unidades em que o livro publica cada propriedade (padrão para digitação e CSV). */
   inputUnits: PropertyUnitPrefs
   notes: string
-  /** Dados fictícios de demonstração. Nunca usar em cálculos reais. */
-  isSimulated?: boolean
   order: number
   createdAt: string
   updatedAt: string

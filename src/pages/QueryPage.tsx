@@ -1,9 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { ComparePanel } from '../components/ComparePanel'
+import { FluidBar } from '../components/FluidBar'
 import { SourceResult } from '../components/SourceResult'
 import { TempPanel } from '../components/TempPanel'
+import type { LoadedFluid } from '../data/fluids/registry'
+import { fluidDisplayName } from '../domain/fluids'
 import { querySource, type SourceQuery } from '../domain/query'
-import type { DataRow, Source, TempUnit } from '../domain/types'
+import type { TempUnit } from '../domain/types'
 import { useSettings } from '../hooks/settingsContext'
 import { href } from '../hooks/useRoute'
 import type { RequestedTemp } from '../lib/report'
@@ -20,15 +23,15 @@ export interface TempState {
 }
 
 interface Props {
-  sources: Source[]
-  rowsBySource: Record<string, DataRow[]>
+  fluid: LoadedFluid
   temp: TempState
   /** id da fonte ativa ou "comparar". */
   tab: string
 }
 
-export function QueryPage({ sources, rowsBySource, temp, tab }: Props) {
+export function QueryPage({ fluid, temp, tab }: Props) {
   const { settings } = useSettings()
+  const { sources, rowsBySource } = fluid
 
   const queries = useMemo(() => {
     const out: Record<string, SourceQuery> = {}
@@ -64,25 +67,20 @@ export function QueryPage({ sources, rowsBySource, temp, tab }: Props) {
         />
         {totalRows === 0 && (
           <section className="panel onboarding">
-            <h2>Comece pelas suas tabelas</h2>
-            <p>O ArTermo não traz valores dos livros. Você cadastra os dados do seu próprio exemplar e o app faz as contas.</p>
-            <ol>
-              <li>Na Biblioteca, abra Kreith, Incropera ou Çengel e preencha edição, ano, página e pressão de referência.</li>
-              <li>Digite as linhas da tabela ou importe um CSV (há um modelo pronto para baixar).</li>
-              <li>Volte aqui, informe a temperatura e compare as referências.</li>
-            </ol>
-            <a className="btn btn-primary" href={href({ page: 'biblioteca' })}>
-              Abrir a Biblioteca
+            <h2>Sem dados ainda</h2>
+            <p>Os dados de {fluidDisplayName(fluid.def)} ainda não foram incluídos nesta versão do app.</p>
+            <a className="btn" href={href({ page: 'fluidos' })}>
+              Ver outros fluidos
             </a>
-            <p className="muted small">Quer só experimentar a interface? Em Configurações há dados simulados de demonstração, marcados como fictícios.</p>
           </section>
         )}
       </div>
 
       <div className="query-main">
+        <FluidBar fluid={fluid} tC={temp.tC} />
         <nav className="tabs" aria-label="Referências">
           {sources.map((s) => (
-            <a key={s.id} href={href({ page: 'consultar', tab: s.id })} className={`tab${activeTab === s.id ? ' on' : ''}${s.isSimulated ? ' is-sim' : ''}`} aria-current={activeTab === s.id ? 'page' : undefined}>
+            <a key={s.id} href={href({ page: 'consultar', tab: s.id })} className={`tab${activeTab === s.id ? ' on' : ''}`} aria-current={activeTab === s.id ? 'page' : undefined}>
               {s.shortName}
               <span className="tab-count">{rowsBySource[s.id]?.length ?? 0}</span>
             </a>
@@ -93,7 +91,7 @@ export function QueryPage({ sources, rowsBySource, temp, tab }: Props) {
         </nav>
 
         {activeTab === 'comparar' ? (
-          <ComparePanel sources={sources} rowsBySource={rowsBySource} queries={queries} req={req} unit={temp.unit} />
+          <ComparePanel fluidId={fluid.def.id} sources={sources} rowsBySource={rowsBySource} queries={queries} req={req} unit={temp.unit} />
         ) : active ? (
           <SourceResult
             key={active.id}
@@ -104,13 +102,11 @@ export function QueryPage({ sources, rowsBySource, temp, tab }: Props) {
             sig={settings.sigDigits}
             choice={settings.derivedChoice}
             allowExtrapolation={settings.allowExtrapolation}
+            loadErrors={fluid.errors[active.id]}
           />
         ) : (
           <section className="panel empty">
-            <p className="empty-title">Nenhuma referência cadastrada.</p>
-            <a className="btn btn-primary" href={href({ page: 'biblioteca' })}>
-              Abrir a Biblioteca
-            </a>
+            <p className="empty-title">Este fluido não tem referências.</p>
           </section>
         )}
       </div>

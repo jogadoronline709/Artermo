@@ -3,17 +3,24 @@ import { useEffect, useState } from 'react'
 export type Route =
   | { page: 'consultar'; tab?: string }
   | { page: 'comparar' }
-  | { page: 'biblioteca'; sourceId?: string }
+  | { page: 'fluidos'; fluidId?: string; refId?: string }
   | { page: 'config' }
 
-/** Rotas por hash (#/consultar, #/biblioteca/kreith…) — funcionam offline e no GitHub Pages. */
+/** Rotas por hash (#/consultar, #/fluidos/agua/kreith…) — funcionam offline e no GitHub Pages. */
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent)
   switch (parts[0]) {
     case 'comparar':
       return { page: 'comparar' }
+    case 'fluidos': {
+      const r: Route = { page: 'fluidos' }
+      if (parts[1]) r.fluidId = parts[1]
+      if (parts[1] && parts[2]) r.refId = parts[2]
+      return r
+    }
+    // A antiga Biblioteca editável virou Gases/Fluidos.
     case 'biblioteca':
-      return { page: 'biblioteca', sourceId: parts[1] }
+      return { page: 'fluidos' }
     case 'config':
       return { page: 'config' }
     default:
@@ -27,8 +34,14 @@ export function href(route: Route): string {
       return route.tab ? `#/consultar/${encodeURIComponent(route.tab)}` : '#/consultar'
     case 'comparar':
       return '#/comparar'
-    case 'biblioteca':
-      return route.sourceId ? `#/biblioteca/${encodeURIComponent(route.sourceId)}` : '#/biblioteca'
+    case 'fluidos': {
+      let h = '#/fluidos'
+      if (route.fluidId) {
+        h += `/${encodeURIComponent(route.fluidId)}`
+        if (route.refId) h += `/${encodeURIComponent(route.refId)}`
+      }
+      return h
+    }
     case 'config':
       return '#/config'
   }
@@ -44,7 +57,8 @@ export function useRoute(): Route {
     const onChange = () => {
       const next = parseHash(window.location.hash)
       setRoute((prev) => {
-        const samePage = prev.page === next.page && (prev.page !== 'biblioteca' || (next.page === 'biblioteca' && prev.sourceId === next.sourceId))
+        // Trocar só a aba de referência dentro do mesmo fluido não volta ao topo.
+        const samePage = prev.page === next.page && (prev.page !== 'fluidos' || (next.page === 'fluidos' && prev.fluidId === next.fluidId))
         if (!samePage) window.scrollTo({ top: 0 })
         return next
       })

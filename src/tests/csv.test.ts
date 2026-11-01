@@ -1,9 +1,7 @@
 // ATENÇÃO: todos os números deste arquivo são DADOS SINTÉTICOS DE TESTE.
 // Nenhum valor foi retirado de Kreith, Incropera ou Çengel.
 import { describe, expect, it } from 'vitest'
-import { autoMap, csvTemplate, exportSourceCsv, mergeRows, parseCsv, validateImport } from '../data/csv'
-import { newSource } from '../data/defaults'
-import type { DataRow } from '../domain/types'
+import { autoMap, CSV_HEADERS, parseCsv, validateImport } from '../data/csv'
 
 const DEFAULTS = { tempUnit: 'C' as const, units: {} }
 
@@ -70,10 +68,10 @@ describe('importação CSV', () => {
     expect(v.rows).toHaveLength(1)
   })
 
-  it('ignora linhas de comentário e lê o modelo vazio', () => {
-    const parsed = parseCsv(csvTemplate())
+  it('ignora linhas de comentário (usadas para citar a fonte nos CSVs embutidos)', () => {
+    const parsed = parseCsv(['# Fonte: tabela de teste', CSV_HEADERS.join(','), '# comentário no meio', '0,C,1.5'].join('\n'))
     expect(parsed.header[0]).toBe('temperature')
-    expect(parsed.rows).toHaveLength(0)
+    expect(parsed.rows).toHaveLength(1)
   })
 
   it('não executa nem interpreta fórmulas', () => {
@@ -81,40 +79,5 @@ describe('importação CSV', () => {
     const v = validateImport(parsed, autoMap(parsed.header), DEFAULTS, 'teste')
     expect(v.rows).toHaveLength(0)
     expect(v.errors.length).toBeGreaterThan(0)
-  })
-})
-
-describe('exportação CSV e mesclagem', () => {
-  const src = newSource({ id: 'teste', shortName: 'Teste', inputUnits: { dynamicViscosity: '1e-7 Pa.s', specificHeat: 'kJ/(kg.K)' } })
-  const rows: DataRow[] = [
-    { id: '1', sourceId: 'teste', temperatureC: 26.85, originalTemperature: { value: 300, unit: 'K' }, values: { density: 1.5, specificHeat: 1000, dynamicViscosity: 2e-5 } },
-    { id: '2', sourceId: 'teste', temperatureC: 36.85, originalTemperature: { value: 310, unit: 'K' }, values: { density: 1.25 } },
-  ]
-
-  it('exporta e reimporta sem perda (ida e volta)', () => {
-    for (const delim of [',', ';'] as const) {
-      const csv = exportSourceCsv(src, rows, delim)
-      const parsed = parseCsv(csv)
-      const v = validateImport(parsed, autoMap(parsed.header), DEFAULTS, 'teste')
-      expect(v.errors).toEqual([])
-      expect(v.rows).toHaveLength(2)
-      expect(v.rows[0].temperatureC).toBeCloseTo(26.85, 10)
-      expect(v.rows[0].values.specificHeat).toBeCloseTo(1000, 10)
-      expect(v.rows[0].values.dynamicViscosity).toBeCloseTo(2e-5, 18)
-      expect(v.rows[1].values.specificHeat).toBeUndefined()
-    }
-    expect(exportSourceCsv(src, rows, ';')).toContain('1,5')
-  })
-
-  it('mescla substituindo temperaturas coincidentes', () => {
-    const incoming: DataRow[] = [
-      { id: 'n1', sourceId: 'teste', temperatureC: 26.85, originalTemperature: { value: 300, unit: 'K' }, values: { density: 9 } },
-      { id: 'n2', sourceId: 'teste', temperatureC: 100, originalTemperature: { value: 100, unit: 'C' }, values: { density: 7 } },
-    ]
-    const m = mergeRows(rows, incoming, 'upsert')
-    expect(m.replaced).toBe(1)
-    expect(m.added).toBe(1)
-    expect(m.rows.map((r) => r.values.density)).toEqual([9, 1.25, 7])
-    expect(mergeRows(rows, incoming, 'replace').rows).toHaveLength(2)
   })
 })

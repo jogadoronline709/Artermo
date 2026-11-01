@@ -13,14 +13,6 @@ export function downloadText(filename: string, text: string, mime = 'text/plain;
   window.setTimeout(() => URL.revokeObjectURL(url), 2000)
 }
 
-/** Lê um arquivo local como texto, recusando arquivos maiores que `maxBytes`. */
-export async function readTextFile(file: File, maxBytes: number): Promise<string> {
-  if (file.size > maxBytes) {
-    throw new Error(`Arquivo grande demais (${(file.size / 1024 / 1024).toFixed(1)} MB). Limite: ${(maxBytes / 1024 / 1024).toFixed(0)} MB.`)
-  }
-  return file.text()
-}
-
 export async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text)

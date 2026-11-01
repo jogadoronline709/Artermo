@@ -80,7 +80,7 @@ export function pressureFromKPa(valueKPa: number, unit: PressureUnit): number {
 /* ------------------------------------------------------------------ */
 
 export interface UnitDef {
-  /** Identificador estável (usado em CSV, backup e preferências). */
+  /** Identificador estável (usado em CSV e preferências). */
   id: string
   /** Rótulo exibido na interface. */
   label: string
