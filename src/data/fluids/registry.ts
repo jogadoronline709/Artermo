@@ -5,6 +5,7 @@
 import type { FluidDef } from '../../domain/fluids'
 import { AGUA } from './agua/fluid'
 import { AR } from './ar/fluid'
+import { AR_GAS_IDEAL } from './ar-gas-ideal/fluid'
 import { groupCsvByFluid, loadFluid, type LoadedFluid } from './loader'
 
 export type { LoadedFluid } from './loader'
@@ -12,7 +13,7 @@ export type { LoadedFluid } from './loader'
 export const DEFAULT_FLUID_ID = 'ar'
 
 /** Ordem de exibição. */
-export const FLUID_DEFS: FluidDef[] = [AR, AGUA]
+export const FLUID_DEFS: FluidDef[] = [AR, AR_GAS_IDEAL, AGUA]
 
 const glob = import.meta.glob<string>('./*/*.csv', { query: '?raw', import: 'default', eager: true })
 const { byFluid, malformed } = groupCsvByFluid(glob)

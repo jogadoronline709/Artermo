@@ -150,10 +150,11 @@ describe('registro de fluidos', () => {
     expect(ORPHAN_CSVS).toEqual([])
   })
 
-  it('inclui Ar e Água (1 atm) com Kreith, Incropera e Çengel', () => {
-    expect(FLUID_DEFS.map((f) => f.id)).toEqual(['ar', 'agua'])
+  it('lista Ar, Ar (gás ideal) e Água (1 atm), nessa ordem', () => {
+    expect(FLUID_DEFS.map((f) => f.id)).toEqual(['ar', 'ar-gas-ideal', 'agua'])
     expect(findFluid('agua')?.def.condition).toBe('1 atm')
-    for (const f of FLUID_DEFS) expect(f.references.map((r) => r.shortName)).toEqual(['Kreith', 'Incropera', 'Çengel'])
+    for (const id of ['ar', 'agua']) expect(findFluid(id)?.def.references.map((r) => r.shortName)).toEqual(['Kreith', 'Incropera', 'Çengel'])
+    expect(findFluid('ar-gas-ideal')?.def.references.map((r) => r.shortName)).toEqual(['Çengel'])
   })
 
   it('id ausente ou desconhecido cai no Ar', () => {
