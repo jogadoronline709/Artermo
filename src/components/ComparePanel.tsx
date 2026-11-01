@@ -6,7 +6,7 @@ import { effectiveValue, type DerivedChoice, type SourceQuery } from '../domain/
 import type { DataRow, PropertyKey, Source, TempUnit } from '../domain/types'
 import { PROPERTY_DEFS } from '../domain/units'
 import { useSettings } from '../hooks/settingsContext'
-import { href } from '../hooks/useRoute'
+import { selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
 import { copyText, dateStamp, downloadText } from '../lib/files'
 import { compareReportCsv, fmtReqTemp, type CompareRow, type RequestedTemp } from '../lib/report'
 import { useFeedback } from './feedback'
@@ -15,6 +15,7 @@ import { Badge, type BadgeKind } from './PropertyRow'
 const PropertyChart = lazy(() => import('./PropertyChart'))
 
 interface Props {
+  fluidId: string
   sources: Source[]
   rowsBySource: Record<string, DataRow[]>
   queries: Record<string, SourceQuery>
@@ -34,7 +35,7 @@ const MODE_LABEL: Record<AverageMode, string> = {
   available: 'Média das fontes disponíveis',
 }
 
-export function ComparePanel({ sources, rowsBySource, queries, req, unit }: Props) {
+export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, unit }: Props) {
   const { settings, update } = useSettings()
   const { confirm, toast } = useFeedback()
   const [override, setOverride] = useState(false)
@@ -42,11 +43,7 @@ export function ComparePanel({ sources, rowsBySource, queries, req, unit }: Prop
   const [showChart, setShowChart] = useState(false)
   const sig = settings.sigDigits
 
-  // Lista vazia = padrão (todas as fontes não simuladas).
-  const selectedIds =
-    settings.compareSourceIds.length === 0
-      ? sources.filter((s) => !s.isSimulated).map((s) => s.id)
-      : settings.compareSourceIds.filter((id) => sources.some((s) => s.id === id))
+  const selectedIds = selectedCompareIds(settings.compareSelection[fluidId], sources, rowsBySource)
   const selected = sources.filter((s) => selectedIds.includes(s.id))
   const N = selected.length
 
@@ -55,8 +52,7 @@ export function ComparePanel({ sources, rowsBySource, queries, req, unit }: Prop
   const blocked = !compat.compatible && !override
 
   const toggleSource = (id: string) => {
-    const next = selectedIds.includes(id) ? selectedIds.filter((x) => x !== id) : [...selectedIds, id]
-    update({ compareSourceIds: next.length ? next : ['__nenhuma__'] })
+    update({ compareSelection: { ...settings.compareSelection, [fluidId]: toggleCompareId(selectedIds, id) } })
     setOverride(false)
   }
 
@@ -199,9 +195,6 @@ export function ComparePanel({ sources, rowsBySource, queries, req, unit }: Prop
             ))}
           </ul>
           <p className="alert-actions">
-            <a className="btn btn-small" href={href({ page: 'biblioteca' })}>
-              Cadastrar pressões na Biblioteca
-            </a>
             {override ? (
               <button type="button" className="btn btn-small" onClick={() => setOverride(false)}>
                 Bloquear novamente

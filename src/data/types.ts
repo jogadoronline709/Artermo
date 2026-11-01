@@ -27,8 +27,10 @@ export interface AppSettings {
   allowExtrapolation: boolean
   averageMode: AverageMode
   derivedChoice: DerivedChoice
-  /** IDs das fontes que entram na comparação/média. Vazio = todas não simuladas. */
-  compareSourceIds: string[]
+  /** Fluido usado em Consultar e Comparar. */
+  activeFluidId: string
+  /** Referências escolhidas no Comparar, por fluido. Ausente/vazio = as que têm dados. */
+  compareSelection: Record<string, string[]>
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -37,5 +39,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   allowExtrapolation: false,
   averageMode: 'require_all',
   derivedChoice: 'published',
-  compareSourceIds: [],
+  activeFluidId: 'ar',
+  compareSelection: {},
 }

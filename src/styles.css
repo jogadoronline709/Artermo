@@ -1807,3 +1807,23 @@ tbody tr:last-child td {
     display: block;
   }
 }
+
+/* Fluido ativo (Consultar/Comparar) */
+.fluid-bar {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.fluid-bar-name {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.fluid-bar-change {
+  font-size: 0.9em;
+}
+.fluid-bar .alert {
+  margin: 0;
+}

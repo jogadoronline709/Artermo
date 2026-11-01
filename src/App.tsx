@@ -3,6 +3,8 @@ import { parseNumber } from './domain/numbers'
 import type { TempUnit } from './domain/types'
 import { ABSOLUTE_ZERO_C, toCelsius } from './domain/units'
 import { useFeedback } from './components/feedback'
+import { getFluid } from './data/fluids/registry'
+import { useSettings } from './hooks/settingsContext'
 import { repo, useRowsBySource, useSources } from './hooks/useData'
 import { useOnline } from './hooks/usePlatform'
 import { href, useRoute, type Route } from './hooks/useRoute'
@@ -59,6 +61,8 @@ export default function App() {
   const rowsBySource = useRowsBySource()
   const temp = useTemperature()
   const { toast } = useFeedback()
+  const { settings } = useSettings()
+  const fluid = getFluid(settings.activeFluidId)
 
   useEffect(() => {
     const onReady = () => toast('Pronto para uso offline')
@@ -70,11 +74,11 @@ export default function App() {
   const navPage = route.page
 
   let content: ReactNode = null
-  if (loading) content = <p className="muted pad">Abrindo dados locais…</p>
-  else if (route.page === 'consultar' || route.page === 'comparar') {
-    const tab = route.page === 'comparar' ? 'comparar' : (route.tab ?? sources[0]?.id ?? 'comparar')
-    content = <QueryPage sources={sources} rowsBySource={rowsBySource} temp={temp} tab={tab} />
-  } else if (route.page === 'biblioteca') {
+  if (route.page === 'consultar' || route.page === 'comparar') {
+    const tab = route.page === 'comparar' ? 'comparar' : (route.tab ?? fluid.sources[0]?.id ?? 'comparar')
+    content = <QueryPage fluid={fluid} temp={temp} tab={tab} />
+  } else if (loading) content = <p className="muted pad">Abrindo dados locais…</p>
+  else if (route.page === 'biblioteca') {
     const src = route.sourceId ? sources.find((s) => s.id === route.sourceId) : undefined
     if (route.sourceId && !src)
       content = (
