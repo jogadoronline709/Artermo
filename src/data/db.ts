@@ -1,6 +1,4 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { DataRow, Source } from '../domain/types'
-import { createDefaultSources } from './defaults'
 import type { AppSettings, Favorite, HistoryEntry } from './types'
 
 export interface SettingRecord {
@@ -9,19 +7,17 @@ export interface SettingRecord {
 }
 
 /**
- * Banco local (IndexedDB) do ArTermo. Tudo fica no dispositivo.
- * Uma futura camada de sincronização pode observar `updatedAt` das fontes
- * e os ids estáveis (UUID) das linhas.
+ * Banco local (IndexedDB) do ArTermo. Guarda só preferências, favoritos e
+ * histórico — as tabelas dos fluidos vêm embutidas no app.
  */
 export class ArTermoDB extends Dexie {
-  sources!: EntityTable<Source, 'id'>
-  rows!: EntityTable<DataRow, 'id'>
   favorites!: EntityTable<Favorite, 'id'>
   history!: EntityTable<HistoryEntry, 'id'>
   settings!: EntityTable<SettingRecord, 'key'>
 
   constructor(name = 'artermo') {
     super(name)
+    // v1 guardava as tabelas digitadas pelo usuário (Biblioteca editável).
     this.version(1).stores({
       sources: 'id, order',
       rows: 'id, sourceId, [sourceId+temperatureC]',
@@ -29,10 +25,8 @@ export class ArTermoDB extends Dexie {
       history: '++id, at',
       settings: 'key',
     })
-    this.on('populate', (tx) => {
-      // Três referências iniciais, com tabelas vazias.
-      tx.table('sources').bulkAdd(createDefaultSources())
-    })
+    // v2: tabelas passam a ser embutidas; remove fontes e linhas antigas.
+    this.version(2).stores({ sources: null, rows: null })
   }
 }
 

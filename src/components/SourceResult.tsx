@@ -36,14 +36,6 @@ export function LoadErrors({ errors }: { errors: string[] }) {
   )
 }
 
-export function SimulatedBanner() {
-  return (
-    <p className="sim-banner" role="note">
-      <strong>SIMULADOS — NÃO USAR EM CÁLCULOS REAIS.</strong> Tabela fictícia de demonstração, sem relação com nenhum livro.
-    </p>
-  )
-}
-
 export function SourceMeta({ source }: { source: Source }) {
   const c = citation(source)
   return (
@@ -66,7 +58,6 @@ export function SourceResult({ source, rows, query, req, sig, choice, allowExtra
         <header className="panel-head">
           <h2>{source.shortName}</h2>
         </header>
-        {source.isSimulated && <SimulatedBanner />}
         {loadErrors?.length ? (
           <LoadErrors errors={loadErrors} />
         ) : (
@@ -113,7 +104,6 @@ export function SourceResult({ source, rows, query, req, sig, choice, allowExtra
           </div>
         )}
       </header>
-      {source.isSimulated && <SimulatedBanner />}
       <SourceMeta source={source} />
       {allowExtrapolation && <p className="warn-text small">Extrapolação ativada em Configurações: resultados fora da faixa aparecem como estimativas.</p>}
 

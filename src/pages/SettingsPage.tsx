@@ -1,33 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useFeedback } from '../components/feedback'
-import { MAX_BACKUP_BYTES, parseBackup, serializeBackup } from '../data/backup'
-import type { ThemePref } from '../data/types'
-import type { Source } from '../domain/types'
+import { DEFAULT_SETTINGS, type ThemePref } from '../data/types'
 import { useSettings } from '../hooks/settingsContext'
 import { repo } from '../hooks/useData'
 import { detectPlatform, useInstall } from '../hooks/usePlatform'
-import { dateStamp, downloadText, readTextFile } from '../lib/files'
 
-const LAST_BACKUP_KEY = 'artermo-last-backup'
-
-function lastBackupDate(): Date | null {
-  try {
-    const v = localStorage.getItem(LAST_BACKUP_KEY)
-    return v ? new Date(v) : null
-  } catch {
-    return null
-  }
-}
-
-export function SettingsPage({ sources }: { sources: Source[] }) {
+export function SettingsPage() {
   const { settings, update } = useSettings()
   const { confirm, toast } = useFeedback()
   const install = useInstall()
   const platform = detectPlatform()
   const [persisted, setPersisted] = useState<boolean | null>(null)
   const [usage, setUsage] = useState<string>('')
-  const [lastBackup, setLastBackup] = useState<Date | null>(lastBackupDate)
-  const hasDemo = sources.some((s) => s.isSimulated)
 
   useEffect(() => {
     void navigator.storage?.persisted?.().then(setPersisted)
@@ -35,43 +19,6 @@ export function SettingsPage({ sources }: { sources: Source[] }) {
       if (e.usage != null) setUsage(`${(e.usage / 1024).toFixed(0)} kB em uso`)
     })
   }, [])
-
-  async function exportBackup() {
-    const b = await repo.exportBackup()
-    downloadText(`artermo-backup-${dateStamp()}.json`, serializeBackup(b), 'application/json')
-    const now = new Date()
-    try {
-      localStorage.setItem(LAST_BACKUP_KEY, now.toISOString())
-    } catch {
-      /* ignora */
-    }
-    setLastBackup(now)
-    toast('Backup exportado')
-  }
-
-  async function restore(file: File) {
-    let text: string
-    try {
-      text = await readTextFile(file, MAX_BACKUP_BYTES)
-    } catch (e) {
-      toast((e as Error).message, 'error')
-      return
-    }
-    const r = parseBackup(text)
-    if (!r.ok) {
-      toast(`Backup recusado: ${r.errors.slice(0, 3).join(' ')}`, 'error')
-      return
-    }
-    const ok = await confirm({
-      title: 'Restaurar backup?',
-      message: `Todas as referências, tabelas e favoritos atuais serão substituídos por ${r.data.sources.length} referências e ${r.data.rows.length} linhas do arquivo${r.data.exportedAt ? ` (exportado em ${new Date(r.data.exportedAt).toLocaleString('pt-BR')})` : ''}.`,
-      confirmLabel: 'Restaurar backup',
-      danger: true,
-    })
-    if (!ok) return
-    await repo.restoreBackup(r.data)
-    toast('Backup restaurado')
-  }
 
   return (
     <div className="page">
@@ -138,31 +85,6 @@ export function SettingsPage({ sources }: { sources: Source[] }) {
       </section>
 
       <section className="panel">
-        <h2>Backup</h2>
-        <p>
-          O arquivo JSON guarda todas as referências, tabelas e favoritos. Guarde-o fora do navegador — apagar os dados do site ou desinstalar o app remove tudo deste dispositivo.
-        </p>
-        <p className={lastBackup ? 'muted small' : 'warn-text small'}>{lastBackup ? `Último backup exportado neste dispositivo: ${lastBackup.toLocaleString('pt-BR')}.` : 'Nenhum backup exportado ainda neste dispositivo.'}</p>
-        <div className="button-row">
-          <button type="button" className="btn btn-primary" onClick={exportBackup}>
-            Exportar backup JSON
-          </button>
-          <label className="btn file-btn">
-            Restaurar backup JSON
-            <input
-              type="file"
-              accept=".json,application/json"
-              onChange={(e) => {
-                const f = e.target.files?.[0]
-                e.target.value = ''
-                if (f) void restore(f)
-              }}
-            />
-          </label>
-        </div>
-      </section>
-
-      <section className="panel">
         <h2>Instalar no celular ou computador</h2>
         {install.installed ? (
           <p className="ok-text">O ArTermo está rodando como app instalado.</p>
@@ -192,7 +114,7 @@ export function SettingsPage({ sources }: { sources: Source[] }) {
       <section className="panel">
         <h2>Armazenamento</h2>
         <p>
-          Os dados ficam só neste dispositivo (IndexedDB). Nada é enviado para servidores. {usage}
+          As tabelas dos fluidos vêm com o app. Neste dispositivo (IndexedDB) ficam só as preferências, os favoritos e o histórico de consultas. Nada é enviado para servidores. {usage}
         </p>
         {persisted === false && (
           <button
@@ -207,55 +129,38 @@ export function SettingsPage({ sources }: { sources: Source[] }) {
             Pedir armazenamento persistente
           </button>
         )}
-        {persisted && <p className="ok-text small">Armazenamento persistente concedido: o navegador não deve apagar os dados por falta de espaço.</p>}
-      </section>
-
-      <section className="panel">
-        <h2>Dados de demonstração</h2>
-        <p>
-          Cria três referências fictícias (Demo A, B e C) para experimentar a interface. São <strong>SIMULADOS — NÃO USAR EM CÁLCULOS REAIS</strong>, ficam marcadas em todas as telas e não entram
-          na comparação a menos que você as selecione.
-        </p>
-        <div className="button-row">
-          <button type="button" className="btn" onClick={async () => (await repo.loadDemo(), toast('Dados simulados criados'))}>
-            {hasDemo ? 'Recriar dados simulados' : 'Criar dados simulados'}
-          </button>
-          {hasDemo && (
-            <button type="button" className="btn btn-danger-ghost" onClick={async () => (await repo.removeDemo(), toast('Dados simulados removidos'))}>
-              Remover dados simulados
-            </button>
-          )}
-        </div>
+        {persisted && <p className="ok-text small">Armazenamento persistente concedido: o navegador não deve apagar suas preferências por falta de espaço.</p>}
       </section>
 
       <section className="panel danger-zone">
-        <h2>Apagar tudo</h2>
-        <p>Remove todas as referências, tabelas, favoritos e histórico e volta às três referências vazias.</p>
+        <h2>Limpar histórico, favoritos e preferências</h2>
+        <p>Apaga o histórico de consultas, as temperaturas favoritas e as preferências deste dispositivo. As tabelas dos fluidos vêm com o app e não são afetadas.</p>
         <button
           type="button"
           className="btn btn-danger-ghost"
           onClick={async () => {
             const ok = await confirm({
-              title: 'Apagar todos os dados?',
-              message: 'Tudo o que foi cadastrado neste dispositivo será apagado. Esta ação não pode ser desfeita sem um backup.',
-              confirmLabel: 'Apagar tudo',
+              title: 'Limpar histórico, favoritos e preferências?',
+              message: 'Histórico, favoritos e preferências deste dispositivo serão apagados. As tabelas dos fluidos não são afetadas.',
+              confirmLabel: 'Limpar',
               danger: true,
             })
             if (ok) {
-              await repo.resetAll()
-              toast('Dados apagados')
+              await repo.clearUserData()
+              update({ ...DEFAULT_SETTINGS })
+              toast('Histórico, favoritos e preferências apagados')
             }
           }}
         >
-          Apagar todos os dados
+          Limpar histórico, favoritos e preferências
         </button>
       </section>
 
       <section className="panel about">
         <h2>Sobre</h2>
         <p>
-          ArTermo {__APP_VERSION__}. Consulta, interpolação linear e média aritmética de propriedades do ar a partir das tabelas que você cadastra. Sem login, sem servidor, sem
-          rastreamento.
+          ArTermo {__APP_VERSION__}. Consulta, interpolação linear e média aritmética de propriedades termofísicas de gases e fluidos a partir de tabelas de referência embutidas.
+          Sem login, sem servidor, sem rastreamento.
         </p>
       </section>
     </div>

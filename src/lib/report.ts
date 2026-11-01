@@ -43,7 +43,7 @@ const STATUS_TXT: Record<string, string> = {
 
 export function sourceReportText(s: Source, q: SourceQuery, t: RequestedTemp, choice: DerivedChoice, sig: number): string {
   const lines = [
-    `ArTermo — ${s.shortName}${s.isSimulated ? ' — DADOS SIMULADOS, NÃO USAR EM CÁLCULOS REAIS' : ''}`,
+    `ArTermo — ${s.shortName}`,
     citation(s) || '(referência sem metadados cadastrados)',
     `Pressão de referência: ${pressureText(s)}`,
     `T = ${fmtReqTemp(t)}`,
@@ -72,7 +72,6 @@ export function sourceReportCsv(s: Source, q: SourceQuery, t: RequestedTemp, cho
     csvLine(['fonte', s.shortName]),
     csvLine(['referencia', citation(s)]),
     csvLine(['pressao', pressureText(s)]),
-    csvLine(['simulado', s.isSimulated ? 'SIM — NÃO USAR EM CÁLCULOS REAIS' : 'não']),
     csvLine(['T_solicitada', formatPlain(t.value, ','), tempUnitLabel(t.unit)]),
     csvLine(['T_C', formatPlain(t.tC, ',')]),
     '',

@@ -153,7 +153,7 @@ export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, uni
           <span className="control-label">Referências</span>
           <div className="checks">
             {sources.map((s) => (
-              <label key={s.id} className={`check${s.isSimulated ? ' is-sim' : ''}`}>
+              <label key={s.id} className="check">
                 <input type="checkbox" checked={selectedIds.includes(s.id)} onChange={() => toggleSource(s.id)} />
                 {s.shortName}
               </label>
@@ -217,7 +217,7 @@ export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, uni
                 <tr>
                   <th scope="col">Propriedade</th>
                   {selected.map((s) => (
-                    <th key={s.id} scope="col" className={s.isSimulated ? 'is-sim' : ''}>
+                    <th key={s.id} scope="col">
                       {s.shortName}
                     </th>
                   ))}

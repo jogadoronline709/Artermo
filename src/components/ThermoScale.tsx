@@ -42,7 +42,7 @@ export function ThermoScale({ sources, rowsBySource, tC, unit }: Props) {
     <figure className="scale" aria-label="Faixa de temperatura disponível em cada fonte">
       <div className="scale-names">
         {withData.map((s) => (
-          <span key={s.id} className={`scale-name${s.isSimulated ? ' is-sim' : ''}`} title={s.shortName}>
+          <span key={s.id} className="scale-name" title={s.shortName}>
             {s.shortName}
           </span>
         ))}

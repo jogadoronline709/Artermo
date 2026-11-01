@@ -228,7 +228,7 @@ describe('média aritmética das referências', () => {
 })
 
 describe('compatibilidade de pressão e fluido', () => {
-  const base = { fluid: 'Ar', isSimulated: false }
+  const base = { fluid: 'Ar' }
   it('compatível quando todas têm a mesma pressão', () => {
     const r = checkCompatibility([
       { ...base, shortName: 'A', pressureKPa: 101.325 },

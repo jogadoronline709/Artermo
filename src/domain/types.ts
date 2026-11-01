@@ -53,8 +53,6 @@ export interface Source {
   /** Unidades em que o livro publica cada propriedade (padrão para digitação e CSV). */
   inputUnits: PropertyUnitPrefs
   notes: string
-  /** Dados fictícios de demonstração. Nunca usar em cálculos reais. */
-  isSimulated?: boolean
   order: number
   createdAt: string
   updatedAt: string

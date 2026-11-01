@@ -4,7 +4,7 @@ import type { Source } from './types'
 export const PRESSURE_REL_TOLERANCE = 0.005
 
 export interface CompatIssue {
-  kind: 'pressure_missing' | 'pressure_different' | 'fluid_different' | 'simulated'
+  kind: 'pressure_missing' | 'pressure_different' | 'fluid_different'
   message: string
 }
 
@@ -26,9 +26,8 @@ function normFluid(s: string): string {
 /**
  * Verifica se as fontes podem ser comparadas/mediadas:
  * mesmo fluido e pressão de referência cadastrada e compatível.
- * Também acusa mistura de dados SIMULADOS com dados reais.
  */
-export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' | 'pressureKPa' | 'isSimulated'>[]): CompatResult {
+export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' | 'pressureKPa'>[]): CompatResult {
   const issues: CompatIssue[] = []
   if (sources.length < 2) return { compatible: true, issues }
 
@@ -59,14 +58,6 @@ export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' |
     issues.push({
       kind: 'fluid_different',
       message: `Fluidos diferentes: ${sources.map((s) => `${s.shortName} = "${s.fluid || '—'}"`).join('; ')}.`,
-    })
-  }
-
-  const sim = sources.filter((s) => s.isSimulated)
-  if (sim.length && sim.length < sources.length) {
-    issues.push({
-      kind: 'simulated',
-      message: `Mistura de dados SIMULADOS (${sim.map((s) => s.shortName).join(', ')}) com fontes reais.`,
     })
   }
 

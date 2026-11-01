@@ -5,7 +5,7 @@ import { ABSOLUTE_ZERO_C, toCelsius } from './domain/units'
 import { useFeedback } from './components/feedback'
 import { findFluid, FLUIDS, getFluid } from './data/fluids/registry'
 import { useSettings } from './hooks/settingsContext'
-import { repo, useRowsBySource, useSources } from './hooks/useData'
+import { repo } from './hooks/useData'
 import { useOnline } from './hooks/usePlatform'
 import { href, useRoute, type Route } from './hooks/useRoute'
 import { FluidPage } from './pages/FluidPage'
@@ -57,8 +57,6 @@ function useTemperature(): TempState {
 export default function App() {
   const route = useRoute()
   const online = useOnline()
-  const sources = useSources()
-  const rowsBySource = useRowsBySource()
   const temp = useTemperature()
   const { toast } = useFeedback()
   const { settings } = useSettings()
@@ -70,7 +68,6 @@ export default function App() {
     return () => window.removeEventListener('artermo:offline-ready', onReady)
   }, [toast])
 
-  const loading = sources === undefined || rowsBySource === undefined
   const navPage = route.page
 
   let content: ReactNode = null
@@ -89,8 +86,7 @@ export default function App() {
         </div>
       )
     else content = f ? <FluidPage key={f.def.id} fluid={f} refId={route.refId} /> : <FluidsPage fluids={FLUIDS} />
-  } else if (loading) content = <p className="muted pad">Abrindo dados locais…</p>
-  else content = <SettingsPage sources={sources} />
+  } else content = <SettingsPage />
 
   return (
     <div className="app">
