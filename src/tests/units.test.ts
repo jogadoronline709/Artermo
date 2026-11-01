@@ -116,10 +116,11 @@ describe('leitura de números (vírgula e ponto decimal)', () => {
 })
 
 describe('propriedades de gás ideal e conjuntos', () => {
-  it('converte h, u e s° para SI', () => {
-    expect(toCanonical('enthalpy', 1.5, 'kJ/kg')).toBeCloseTo(1500, 9)
-    expect(toCanonical('internalEnergy', 2, 'kJ/kg')).toBeCloseTo(2000, 9)
-    expect(toCanonical('entropyStd', 1.2, 'kJ/(kg.K)')).toBeCloseTo(1200, 9)
+  it('guarda h, u e s° em kJ (unidade dos livros de termodinâmica)', () => {
+    expect(toCanonical('enthalpy', 1.5, 'kJ/kg')).toBeCloseTo(1.5, 12)
+    expect(toCanonical('enthalpy', 1500, 'J/kg')).toBeCloseTo(1.5, 12)
+    expect(toCanonical('internalEnergy', 2, 'kJ/kg')).toBeCloseTo(2, 12)
+    expect(toCanonical('entropyStd', 1.2, 'kJ/(kg.K)')).toBeCloseTo(1.2, 12)
     expect(parsePropertyUnit('enthalpy', 'kJ/kg')).toBe('kJ/kg')
   })
 

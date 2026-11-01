@@ -58,7 +58,7 @@ describe('tabela somente leitura', () => {
 describe('tabela somente leitura de gás ideal', () => {
   it('mostra só as propriedades do conjunto, na ordem dele', () => {
     const src = newSource({ id: 's', shortName: 'S', propertySet: 'gasIdeal', inputUnits: { enthalpy: 'kJ/kg', internalEnergy: 'kJ/kg' } })
-    const t = buildReadOnlyTable(src, [row('1', 0, { value: 273.15, unit: 'K' }, { relativePressure: 2, internalEnergy: 2000, enthalpy: 3000 })], 4)
+    const t = buildReadOnlyTable(src, [row('1', 0, { value: 273.15, unit: 'K' }, { relativePressure: 2, internalEnergy: 2, enthalpy: 3 })], 4)
     expect(t.columns.map((c) => c.label)).toEqual(['T', 'T original', 'h', 'u', 'Pᵣ'])
     expect(t.rows[0].slice(2)).toEqual(['3,000', '2,000', '2,000'])
   })

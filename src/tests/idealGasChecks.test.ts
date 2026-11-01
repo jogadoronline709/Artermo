@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest'
 import type { DataRow } from '../domain/types'
 import { checkIdealGasTable } from '../lib/idealGasChecks'
 
-const R = 287 // J/(kg·K)
-const CP = 1000 // J/(kg·K), constante só para gerar a tabela sintética
+const R = 0.287 // kJ/(kg·K)
+const CP = 1.0 // kJ/(kg·K), constante só para gerar a tabela sintética
 
 /** Tabela coerente: h = cp·T, u = h − R·T, s° = cp·ln(T/200), Pᵣ = exp(s°/R), vᵣ = 2,87·T/Pᵣ. */
 function synthetic(): DataRow[] {
@@ -32,7 +32,7 @@ describe('conferência de tabela de gás ideal', () => {
   it('um dígito trocado em u é acusado na linha certa', () => {
     const rows = synthetic()
     const r = rows.find((x) => x.originalTemperature.value === 300)!
-    r.values.internalEnergy! += 9000 // como digitar 223,0 no lugar de 214,0 kJ/kg
+    r.values.internalEnergy! += 9 // como digitar 223,0 no lugar de 214,0 kJ/kg
     const msgs = checkIdealGasTable(rows)
     expect(msgs.length).toBeGreaterThan(0)
     expect(msgs[0]).toContain('T = 300 K')

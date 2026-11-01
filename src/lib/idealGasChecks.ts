@@ -6,12 +6,12 @@
 import { formatTemp } from '../domain/numbers'
 import type { DataRow, PropertyKey } from '../domain/types'
 
-/** Constante do ar, J/(kg·K). */
-const R_AR = 287
+/** Constante do ar, kJ/(kg·K) (h e u ficam em kJ/kg; s° em kJ/(kg·K)). */
+const R_AR = 0.287
 /** Tolerância relativa para (h − u)/(R·T) e para vᵣ·Pᵣ/T. */
 const REL_TOL = 0.003
-/** Tolerância absoluta para Δs° − R·ln(Pᵣ₂/Pᵣ₁), J/(kg·K) (= 0,0005 kJ/(kg·K)). */
-const S_TOL = 0.5
+/** Tolerância absoluta para Δs° − R·ln(Pᵣ₂/Pᵣ₁), kJ/(kg·K). */
+const S_TOL = 0.0005
 
 const KEYS: PropertyKey[] = ['enthalpy', 'internalEnergy', 'entropyStd', 'relativePressure', 'relativeVolume']
 const SYMBOL: Partial<Record<PropertyKey, string>> = { enthalpy: 'h', internalEnergy: 'u', entropyStd: 's°', relativePressure: 'Pᵣ', relativeVolume: 'vᵣ' }
@@ -57,7 +57,7 @@ export function checkIdealGasTable(rows: DataRow[]): string[] {
     const ds = (b.values.entropyStd as number) - (a.values.entropyStd as number)
     const expected = R_AR * Math.log((b.values.relativePressure as number) / (a.values.relativePressure as number))
     if (Math.abs(ds - expected) > S_TOL) {
-      out.push(`${at(b)}: Δs° = ${(ds / 1000).toFixed(5)} kJ/(kg·K), mas R·ln(Pᵣ₂/Pᵣ₁) = ${(expected / 1000).toFixed(5)}.`)
+      out.push(`${at(b)}: Δs° = ${ds.toFixed(5)} kJ/(kg·K), mas R·ln(Pᵣ₂/Pᵣ₁) = ${expected.toFixed(5)}.`)
     }
   }
   return out

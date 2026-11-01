@@ -93,11 +93,11 @@ describe('cabeçalhos de gás ideal', () => {
     expect(m.internalEnergy).toBe(6)
   })
 
-  it('lê um CSV de gás ideal e converte h para J/kg', () => {
+  it('lê um CSV de gás ideal com h em kJ/kg', () => {
     const parsed = parseCsv('temperature (K);enthalpy (kJ/kg);relative_pressure\n300;1,5;2\n310;1,6;2,1')
     const v = validateImport(parsed, autoMap(parsed.header), DEFAULTS, 'teste')
     expect(v.errors).toEqual([])
-    expect(v.rows[0].values.enthalpy).toBeCloseTo(1500, 9)
+    expect(v.rows[0].values.enthalpy).toBeCloseTo(1.5, 12)
     expect(v.rows[1].values.relativePressure).toBe(2.1)
   })
 })
