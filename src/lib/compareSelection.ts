@@ -8,11 +8,15 @@ export const NONE_SELECTED = '__nenhuma__'
  * Sem escolha salva: as que têm dados (ou todas, se nenhuma tiver).
  */
 export function selectedCompareIds(saved: string[] | undefined, sources: Source[], rowsBySource: Record<string, DataRow[]>): string[] {
-  if (!saved || saved.length === 0) {
+  const fallback = () => {
     const withData = sources.filter((s) => (rowsBySource[s.id]?.length ?? 0) > 0)
     return (withData.length ? withData : sources).map((s) => s.id)
   }
-  return saved.filter((id) => sources.some((s) => s.id === id))
+  if (!saved || saved.length === 0) return fallback()
+  const kept = saved.filter((id) => sources.some((s) => s.id === id))
+  // Nenhuma referência salva existe mais (ex.: renomeada numa versão nova): volta ao padrão.
+  if (kept.length === 0 && !saved.includes(NONE_SELECTED)) return fallback()
+  return kept
 }
 
 export function toggleCompareId(current: string[], id: string): string[] {

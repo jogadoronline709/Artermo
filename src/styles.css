@@ -1577,6 +1577,11 @@ tbody tr:last-child td {
 .fluid-bar .alert {
   margin: 0;
 }
+@media print {
+  .fluid-bar-change {
+    display: none;
+  }
+}
 
 /* Gases/Fluidos */
 .fluid-search {

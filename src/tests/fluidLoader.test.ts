@@ -2,7 +2,7 @@
 // Nenhum valor foi retirado de Kreith, Incropera ou Çengel.
 import { describe, expect, it } from 'vitest'
 import { groupCsvByFluid, loadFluid, sourceIdFor } from '../data/fluids/loader'
-import { findFluid, FLUID_DEFS, FLUIDS, getFluid, ORPHAN_CSVS } from '../data/fluids/registry'
+import { findFluid, FLUID_DEFS, FLUIDS, fluidOfSourceId, getFluid, ORPHAN_CSVS } from '../data/fluids/registry'
 import { fluidDisplayName, type FluidDef, type ReferenceDef } from '../domain/fluids'
 
 function ref(id: string, extra: Partial<ReferenceDef> = {}): ReferenceDef {
@@ -160,5 +160,13 @@ describe('registro de fluidos', () => {
     expect(getFluid(undefined).def.id).toBe('ar')
     expect(getFluid('nao-existe').def.id).toBe('ar')
     expect(findFluid('nao-existe')).toBeUndefined()
+  })
+})
+
+describe('fluido de uma referência', () => {
+  it('descobre o fluido pelo id da fonte', () => {
+    expect(fluidOfSourceId('agua-kreith')?.def.id).toBe('agua')
+    expect(fluidOfSourceId('ar-cengel')?.def.id).toBe('ar')
+    expect(fluidOfSourceId('nao-existe')).toBeUndefined()
   })
 })

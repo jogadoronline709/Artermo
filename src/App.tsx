@@ -3,7 +3,7 @@ import { parseNumber } from './domain/numbers'
 import type { TempUnit } from './domain/types'
 import { ABSOLUTE_ZERO_C, toCelsius } from './domain/units'
 import { useFeedback } from './components/feedback'
-import { findFluid, FLUIDS, getFluid } from './data/fluids/registry'
+import { findFluid, FLUIDS, fluidOfSourceId, getFluid } from './data/fluids/registry'
 import { useSettings } from './hooks/settingsContext'
 import { repo } from './hooks/useData'
 import { useOnline } from './hooks/usePlatform'
@@ -59,8 +59,13 @@ export default function App() {
   const online = useOnline()
   const temp = useTemperature()
   const { toast } = useFeedback()
-  const { settings } = useSettings()
-  const fluid = getFluid(settings.activeFluidId)
+  const { settings, update } = useSettings()
+  // Um link para a referência de outro fluido (ex.: #/consultar/agua-kreith) ativa esse fluido.
+  const tabOwner = route.page === 'consultar' && route.tab ? fluidOfSourceId(route.tab) : undefined
+  const fluid = tabOwner ?? getFluid(settings.activeFluidId)
+  useEffect(() => {
+    if (tabOwner && tabOwner.def.id !== settings.activeFluidId) update({ activeFluidId: tabOwner.def.id })
+  }, [tabOwner, settings.activeFluidId, update])
 
   useEffect(() => {
     const onReady = () => toast('Pronto para uso offline')

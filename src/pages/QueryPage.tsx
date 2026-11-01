@@ -91,7 +91,7 @@ export function QueryPage({ fluid, temp, tab }: Props) {
         </nav>
 
         {activeTab === 'comparar' ? (
-          <ComparePanel fluidId={fluid.def.id} sources={sources} rowsBySource={rowsBySource} queries={queries} req={req} unit={temp.unit} />
+          <ComparePanel fluidId={fluid.def.id} loadErrors={fluid.errors} sources={sources} rowsBySource={rowsBySource} queries={queries} req={req} unit={temp.unit} />
         ) : active ? (
           <SourceResult
             key={active.id}

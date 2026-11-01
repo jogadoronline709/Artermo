@@ -8,7 +8,7 @@ import { PROPERTY_DEFS } from '../domain/units'
 import { useSettings } from '../hooks/settingsContext'
 import { selectedCompareIds, toggleCompareId } from '../lib/compareSelection'
 import { copyText, dateStamp, downloadText } from '../lib/files'
-import { compareReportCsv, fluidRangeNotice, fmtReqTemp, type CompareRow, type RequestedTemp } from '../lib/report'
+import { compareReportCsv, fluidRangeNotice, fmtReqTemp, missingTableLabel, type CompareRow, type RequestedTemp } from '../lib/report'
 import { useFeedback } from './feedback'
 import { Badge, type BadgeKind } from './PropertyRow'
 
@@ -16,6 +16,8 @@ const PropertyChart = lazy(() => import('./PropertyChart'))
 
 interface Props {
   fluidId: string
+  /** Erros de carga das tabelas embutidas, por id de fonte. */
+  loadErrors?: Record<string, string[]>
   sources: Source[]
   rowsBySource: Record<string, DataRow[]>
   queries: Record<string, SourceQuery>
@@ -35,7 +37,7 @@ const MODE_LABEL: Record<AverageMode, string> = {
   available: 'Média das fontes disponíveis',
 }
 
-export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, unit }: Props) {
+export function ComparePanel({ fluidId, loadErrors, sources, rowsBySource, queries, req, unit }: Props) {
   const { settings, update } = useSettings()
   const { confirm, toast } = useFeedback()
   const [override, setOverride] = useState(false)
@@ -61,7 +63,7 @@ export function ComparePanel({ fluidId, sources, rowsBySource, queries, req, uni
     : PROPERTY_DEFS.map((d) => {
       const cells: Cell[] = selected.map((s) => {
         const rows = rowsBySource[s.id] ?? []
-        if (rows.length === 0) return { name: s.shortName, value: null, kind: 'missing', label: 'Tabela vazia' }
+        if (rows.length === 0) return { name: s.shortName, value: null, kind: 'missing', label: missingTableLabel(loadErrors?.[s.id]) }
         const e = effectiveValue(queries[s.id][d.key], d.derived ? settings.derivedChoice : 'published')
         if (!e.ok) return { name: s.shortName, value: null, kind: 'missing', label: e.reason }
         return { name: s.shortName, value: e.value, kind: e.status as BadgeKind, label: '' }

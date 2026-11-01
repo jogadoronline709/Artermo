@@ -34,6 +34,11 @@ export function findFluid(id: string): LoadedFluid | undefined {
   return FLUIDS.find((f) => f.def.id === id)
 }
 
+/** Fluido dono de uma fonte (ex.: 'agua-kreith' → Água). */
+export function fluidOfSourceId(sourceId: string): LoadedFluid | undefined {
+  return FLUIDS.find((f) => f.sources.some((s) => s.id === sourceId))
+}
+
 /** Fluido pelo id; se não existir, o Ar. */
 export function getFluid(id: string | undefined): LoadedFluid {
   return (id ? findFluid(id) : undefined) ?? (findFluid(DEFAULT_FLUID_ID) as LoadedFluid)
