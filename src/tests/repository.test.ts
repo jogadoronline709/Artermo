@@ -55,6 +55,7 @@ describe('banco local', () => {
     expect(s.activeFluidId).toBe('ar')
     expect(s.compareSelection).toEqual({})
     expect(s.theme).toBe('dark')
+    expect(s).not.toHaveProperty('compareSourceIds')
   })
 
   it('limpar dados do usuário apaga favoritos, histórico e preferências', async () => {

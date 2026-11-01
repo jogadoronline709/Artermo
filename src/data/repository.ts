@@ -37,7 +37,13 @@ export function createRepository(db: ArTermoDB) {
     /* ---------------- Configurações ---------------- */
     async getSettings(): Promise<AppSettings> {
       const rec = await db.settings.get('app')
-      return { ...DEFAULT_SETTINGS, ...(rec?.value ?? {}) }
+      const stored = (rec?.value ?? {}) as Partial<AppSettings>
+      // Mantém só as chaves atuais; descarta as de versões antigas (ex.: compareSourceIds).
+      const out = { ...DEFAULT_SETTINGS }
+      for (const k of Object.keys(DEFAULT_SETTINGS) as (keyof AppSettings)[]) {
+        if (stored[k] !== undefined) (out as Record<string, unknown>)[k] = stored[k]
+      }
+      return out
     },
     async saveSettings(s: AppSettings): Promise<void> {
       await db.settings.put({ key: 'app', value: s })

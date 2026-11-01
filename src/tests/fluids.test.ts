@@ -67,3 +67,21 @@ describe('faixa válida', () => {
     expect(rangeWarning(AR, 5000)).toBeNull()
   })
 })
+
+describe('busca por palavras e categoria', () => {
+  const items2 = [{ def: { ...AR, category: 'gas' as const } }, { def: AGUA }]
+  const ids2 = (q: string) => searchFluids(items2, q).map((i) => i.def.id)
+
+  it.each(['agua 1 atm', 'Água (1 atm)', 'atm agua'])('"%s" encontra a água', (q) => {
+    expect(ids2(q)).toEqual(['agua'])
+  })
+
+  it('a categoria também é pesquisável', () => {
+    expect(ids2('gás')).toEqual(['ar'])
+    expect(ids2('liquido')).toEqual(['agua'])
+  })
+
+  it('palavra que não existe em nenhum termo não encontra nada', () => {
+    expect(ids2('agua xyz')).toEqual([])
+  })
+})

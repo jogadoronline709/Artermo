@@ -34,3 +34,9 @@ describe('seleção de referências do Comparar', () => {
     expect(toggleCompareId(['a'], 'a')).toEqual([NONE_SELECTED])
   })
 })
+
+describe('seleção salva que ficou obsoleta', () => {
+  it('se nenhuma referência salva existe mais, volta ao padrão', () => {
+    expect(selectedCompareIds(['zz', 'yy'], sources, withData)).toEqual(['a', 'c'])
+  })
+})

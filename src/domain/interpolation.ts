@@ -137,7 +137,7 @@ function linear(p1: Point, p2: Point, t: number): { value: number; fraction: num
 export function describeNoValue(r: InterpResult, fmtT: (t: number) => string): string {
   switch (r.status) {
     case 'no_data':
-      return 'Sem dados cadastrados para esta propriedade.'
+      return 'Sem dados para esta propriedade nesta tabela.'
     case 'out_of_range':
       return `Fora da faixa disponível (${fmtT(r.range.min)} a ${fmtT(r.range.max)}). Extrapolação desativada.`
     case 'insufficient':

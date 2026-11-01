@@ -57,24 +57,29 @@ export function categoryLabel(c: FluidCategory): string {
 
 const SUBSCRIPT_DIGITS = '₀₁₂₃₄₅₆₇₈₉'
 
-/** Minúsculas, sem acentos, dígitos subscritos viram normais, espaços colapsados. */
+/** Minúsculas, sem acentos nem pontuação, dígitos subscritos viram normais, espaços colapsados. */
 export function normalizeSearch(s: string): string {
   return s
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[₀-₉]/g, (d) => String(SUBSCRIPT_DIGITS.indexOf(d)))
     .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
     .replace(/\s+/g, ' ')
     .trim()
 }
 
-/** Filtra fluidos cujo nome, condição ou apelidos contêm a consulta. Mantém a ordem. */
+/**
+ * Filtra fluidos em que cada palavra da consulta aparece no nome, na condição,
+ * na categoria ou nos apelidos. Mantém a ordem.
+ */
 export function searchFluids<T extends { def: FluidDef }>(items: T[], query: string): T[] {
-  const q = normalizeSearch(query)
-  if (!q) return items
-  return items.filter(({ def }) =>
-    [def.name, def.condition, fluidDisplayName(def), ...def.aliases].some((term) => normalizeSearch(term).includes(q)),
-  )
+  const words = normalizeSearch(query).split(' ').filter(Boolean)
+  if (!words.length) return items
+  return items.filter(({ def }) => {
+    const hay = normalizeSearch([def.name, def.condition, categoryLabel(def.category), ...def.aliases].join(' '))
+    return words.every((w) => hay.includes(w))
+  })
 }
 
 /** Mensagem de alerta quando `tC` sai da faixa válida do fluido; `null` dentro dela. */

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { getFluid } from '../data/fluids/registry'
 import { querySource } from '../domain/query'
-import { compareReportCsv, fluidRangeNotice, sourceReportCsv, sourceReportText, type RequestedTemp } from '../lib/report'
+import { compareReportCsv, fluidRangeNotice, missingTableLabel, pressureText, sourceReportCsv, sourceReportText, type RequestedTemp } from '../lib/report'
 
 const agua = getFluid('agua')
 const ar = getFluid('ar')
@@ -37,5 +37,18 @@ describe('relatórios exportados', () => {
     const csv = compareReportCsv(at(120), agua.sources, [], 'Exigir todas', '')
     expect(csv).toContain('fluido;Água (1 atm)')
     expect(csv).toContain('aviso;')
+  })
+})
+
+describe('textos sem "cadastrado"', () => {
+  it('pressão ausente aparece como não informada', () => {
+    expect(pressureText(src)).toBe('não informada')
+    expect(sourceReportText(src, q(50), at(50), 'published', 4)).toContain('(referência sem metadados)')
+  })
+
+  it('tabela com erro e tabela vazia têm rótulos diferentes', () => {
+    expect(missingTableLabel(['Linha 2 — erro'])).toBe('Tabela com erro')
+    expect(missingTableLabel(undefined)).toBe('Tabela vazia')
+    expect(missingTableLabel([])).toBe('Tabela vazia')
   })
 })

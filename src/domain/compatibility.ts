@@ -35,7 +35,7 @@ export function checkCompatibility(sources: Pick<Source, 'shortName' | 'fluid' |
   if (missing.length) {
     issues.push({
       kind: 'pressure_missing',
-      message: `Pressão de referência não cadastrada em: ${missing.map((s) => s.shortName).join(', ')}.`,
+      message: `Pressão de referência não informada em: ${missing.map((s) => s.shortName).join(', ')}.`,
     })
   }
 

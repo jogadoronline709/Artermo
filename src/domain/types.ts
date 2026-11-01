@@ -44,7 +44,7 @@ export interface Source {
   fluidId: string
   /** Nome exibido do fluido da tabela (ex.: "Água (1 atm)"). */
   fluid: string
-  /** Pressão de referência em kPa (canônica). `null` = não cadastrada. */
+  /** Pressão de referência em kPa (canônica). `null` = não informada. */
   pressureKPa: number | null
   /** Unidade em que o usuário informou a pressão (apenas para exibição). */
   pressureUnit: PressureUnit

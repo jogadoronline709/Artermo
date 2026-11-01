@@ -7,6 +7,11 @@ import { PROPERTY_DEFS, pressureFromKPa, tempUnitLabel } from '../domain/units'
 import { findFluid } from '../data/fluids/registry'
 import { rangeWarning } from '../domain/fluids'
 
+/** Rótulo de uma referência sem resultado: tabela com erro de carga ou vazia. */
+export function missingTableLabel(errors: string[] | undefined): string {
+  return errors?.length ? 'Tabela com erro' : 'Tabela vazia'
+}
+
 /** Alerta de faixa válida do fluido para a temperatura (vazio se não houver). */
 export function fluidRangeNotice(fluidId: string, tC: number): string {
   const f = findFluid(fluidId)
@@ -37,7 +42,7 @@ export function citation(s: Source): string {
 }
 
 export function pressureText(s: Source): string {
-  if (s.pressureKPa == null) return 'pressão não cadastrada'
+  if (s.pressureKPa == null) return 'não informada'
   const v = pressureFromKPa(s.pressureKPa, s.pressureUnit)
   return `${formatTemp(v)} ${s.pressureUnit}`
 }
@@ -54,7 +59,7 @@ export function sourceReportText(s: Source, q: SourceQuery, t: RequestedTemp, ch
   const lines = [
     `ArTermo — ${s.shortName}`,
     `Fluido: ${s.fluid}`,
-    citation(s) || '(referência sem metadados cadastrados)',
+    citation(s) || '(referência sem metadados)',
     `Pressão de referência: ${pressureText(s)}`,
     `T = ${fmtReqTemp(t)}`,
     ...(notice ? [`AVISO: ${notice}`] : []),
