@@ -1,6 +1,13 @@
 # ArTermo — Propriedades Termofísicas
 
-Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTermo traz embutidas as tabelas de propriedades de gases e fluidos — **Ar** e **Água (1 atm)**, cada um com as referências Kreith, Incropera e Çengel, e **Ar (gás ideal)**, com a Tabela A-17 do Çengel (h, u, s°, pressão relativa e volume relativo, de 200 a 2.250 K) — e:
+Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTermo traz embutidas as tabelas de propriedades de **Ar** e **Água (1 atm)**, cada uma com três referências:
+
+| Fluido | Kreith | Incropera | Çengel |
+|---|---|---|---|
+| Ar (1 atm) | Tabela 27, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
+| Água (líquido saturado) | Tabela 13, 0–280 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
+
+E o app:
 
 - interpola linearmente cada propriedade, em cada referência, para a temperatura pedida (°C, K ou °F);
 - mostra **como foi calculado** — fórmula, pontos T₁/y₁ e T₂/y₂, fração e resultado;
@@ -8,7 +15,7 @@ Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTer
 - calcula ν = μ/ρ, α = k/(ρ·cp) e Pr = μ·cp/k e compara com os valores publicados;
 - funciona offline depois do primeiro acesso.
 
-As tabelas são **somente leitura** no app. Elas são fornecidas pelo dono do projeto e incluídas no código, sempre com a fonte citada (autores, título, edição, ano, página/tabela). Nenhum valor é inventado, estimado ou completado. Enquanto uma tabela não é incluída, a referência aparece como "Tabela ainda não disponível nesta versão do app."
+As tabelas são **somente leitura** no app. Elas são fornecidas pelo dono do projeto e incluídas no código, sempre com a fonte citada (autores, título, edição, ano, página/tabela). Nenhum valor é inventado, estimado ou completado. Onde o livro não publica ν ou α (Incropera A.6 e Çengel A-9, água), o app os calcula e marca como **calculado**. Um teste confere cada tabela: ν, α e Pr impressos contra μ/ρ, k/(ρ·cp) e μ·cp/k; os poucos pontos em que o próprio livro diverge foram conferidos na imagem, mantidos como impressos e aparecem nas observações da referência.
 
 > Especificação do projeto: [`CLAUDE.md`](CLAUDE.md). Prompt original: [`docs/PROMPT_INICIAL.md`](docs/PROMPT_INICIAL.md).
 
@@ -92,7 +99,7 @@ Unidades aceitas:
 | s° (gás ideal) | kJ/(kg·K) (no cabeçalho, escreva `kJ/kg.K`) | J/(kg·K) |
 | Pᵣ, vᵣ (gás ideal) | — | — |
 
-**Tabelas de gás ideal** (fluido com `propertySet: 'gasIdeal'`) usam os cabeçalhos `temperature`, `enthalpy`, `internal_energy`, `entropy_std`, `relative_pressure` e `relative_volume`. Atenção: a coluna "Pr" dessas tabelas é a **pressão relativa** (`relative_pressure`); o cabeçalho `pr` é lido como número de Prandtl. A Tabela A-17 embutida é conferida por teste com as relações h − u = R·T, vᵣ·Pᵣ/T constante e Δs° = R·ln(Pᵣ₂/Pᵣ₁); os 5 pontos em que a tabela impressa foge dessas relações (550, 630, 820, 1040 e 1800 K) foram mantidos como no livro e aparecem nas observações da referência.
+**Tabelas de gás ideal** (fluido com `propertySet: 'gasIdeal'`) usam os cabeçalhos `temperature`, `enthalpy`, `internal_energy`, `entropy_std`, `relative_pressure` e `relative_volume`. Atenção: a coluna "Pr" dessas tabelas é a **pressão relativa** (`relative_pressure`); o cabeçalho `pr` é lido como número de Prandtl. (Nenhum fluido embutido usa esse conjunto hoje; o suporte fica pronto para o futuro.)
 
 O passo a passo para incluir um fluido ou uma tabela está no [`CLAUDE.md`](CLAUDE.md), seção "Como adicionar um fluido ou uma tabela".
 

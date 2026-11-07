@@ -38,7 +38,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   sigDigits: 5,
   allowExtrapolation: false,
   averageMode: 'require_all',
-  derivedChoice: 'published',
+  derivedChoice: 'published_else_calculated',
   activeFluidId: 'ar',
   compareSelection: {},
 }

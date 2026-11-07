@@ -33,10 +33,16 @@ Fluidos atuais (registro em `src/data/fluids/registry.ts`):
 | id | Nome exibido | Categoria | Faixa válida |
 |---|---|---|---|
 | `ar` | Ar | Gás | — |
-| `ar-gas-ideal` | Ar (gás ideal) | Gás | — |
 | `agua` | Água (1 atm) | Líquido | 0 a 100 °C |
 
-Ar e Água têm as referências Kreith, Incropera e Çengel e usam o conjunto de propriedades `transporte`. **Ar (gás ideal)** usa o conjunto `gasIdeal`, `pressureApplies: false` e tem só o Çengel (Tabela A-17, 200–2.250 K, já embutida). Na A-17 impressa, 5 valores fogem das relações de gás ideal (550 K h; 630 e 820 K Pᵣ; 1040 e 1800 K vᵣ): ficam como impressos, listados em `arGasIdeal.test.ts` e nas observações da referência. Enquanto o dono não fornecer a tabela, a referência fica vazia e a interface mostra "Tabela ainda não disponível nesta versão do app."
+Ar e Água têm as referências Kreith, Incropera e Çengel, todas já embutidas, e usam o conjunto de propriedades `transporte`:
+
+| Fluido | Kreith | Incropera | Çengel |
+|---|---|---|---|
+| Ar (1 atm) | Tabela 27, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
+| Água (líquido saturado) | Tabela 13, 0–280 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
+
+`src/tests/embeddedTables.test.ts` confere cada tabela (ν, α, Pr impressos × μ/ρ, k/(ρ·cp), μ·cp/k), com tolerância maior para o Kreith (Pr com 2 algarismos) e uma lista de pontos em que o livro impresso diverge — conferidos na imagem e mantidos como impressos (Incropera ar 1300 K α; Kreith água 75 °C ν e Pr; Incropera água perto do ponto crítico). O "Ar (gás ideal)" (Tabela A-17) foi retirado a pedido do dono; o conjunto `gasIdeal` continua suportado. Referência sem CSV mostra "Tabela ainda não disponível nesta versão do app."
 
 Metadados por referência (`ReferenceDef`): nome curto, autores, título, edição, ano, página/tabela, pressão de referência, unidade original de temperatura, unidades das colunas e observações. Não presumir nenhum deles.
 
@@ -149,7 +155,7 @@ Na aba **Comparar / Média** (sempre dentro do fluido ativo):
 Preservar a separação entre lógica de cálculo, dados e interface.
 
 ## 15. Como adicionar um fluido ou uma tabela
-1. **Fluido novo:** crie `src/data/fluids/<id>/fluid.ts` exportando um `FluidDef` (id, nome, condição, categoria, apelidos de busca, faixa válida se houver, referências). Copie `agua/fluid.ts` como modelo. Para tabelas de gás ideal, use `propertySet: 'gasIdeal'` e `pressureApplies: false` (modelo: `ar-gas-ideal/fluid.ts`); se o gás não for ar, `checkIdealGasTable` precisa da constante R do gás.
+1. **Fluido novo:** crie `src/data/fluids/<id>/fluid.ts` exportando um `FluidDef` (id, nome, condição, categoria, apelidos de busca, faixa válida se houver, referências). Copie `agua/fluid.ts` como modelo (unidades de cada coluna em `inputUnits`). Para tabelas de gás ideal, use `propertySet: 'gasIdeal'` e `pressureApplies: false`.
 2. Inclua o fluido em `FLUID_DEFS`, em `src/data/fluids/registry.ts` (a ordem da lista é a ordem de exibição).
 3. **Tabela de uma referência:** crie `src/data/fluids/<id>/<refId>.csv` (ex.: `agua/kreith.csv`) com os cabeçalhos de `CSV_HEADERS` (`src/data/csv.ts`). Copie os números exatamente como fornecidos; use `#` no topo para citar a fonte.
 4. Preencha no `ReferenceDef` os metadados conforme informados pelo dono: autores, título, edição, ano, página/tabela e pressão de referência. **Toda coluna precisa de unidade declarada** — no cabeçalho do CSV (ex.: `temperature (K)`, `dynamic_viscosity (1e-7 Pa.s)`), na coluna `*_unit` ou em `originalTempUnit`/`inputUnits` da referência. Coluna sem unidade, unidade não reconhecida, coluna desconhecida ou unidades diferentes na mesma coluna são erro de carga (só Pr dispensa unidade). A tabela é exibida na unidade declarada de cada coluna.

@@ -48,5 +48,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/tests/**/*.test.ts'],
+    // O cache de módulos não percebe CSVs novos em import.meta.glob: o teste das
+    // tabelas embutidas poderia passar olhando dados antigos.
+    fsModuleCache: false,
   },
 })
