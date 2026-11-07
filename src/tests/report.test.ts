@@ -43,8 +43,9 @@ describe('relatórios exportados', () => {
 
 describe('textos sem "cadastrado"', () => {
   it('pressão ausente aparece como não informada', () => {
-    expect(pressureText(src)).toBe('não informada')
-    expect(sourceReportText(src, q(50), at(50), 'published', 4)).toContain('(referência sem metadados)')
+    const bare = newSource({ id: 'b', shortName: 'B', fluidId: 'x', fluid: 'X' })
+    expect(pressureText(bare)).toBe('não informada')
+    expect(sourceReportText(bare, q(50), at(50), 'published', 4)).toContain('(referência sem metadados)')
   })
 
   it('tabela com erro e tabela vazia têm rótulos diferentes', () => {
@@ -84,6 +85,7 @@ describe('observações da referência nos relatórios', () => {
     expect(sourceReportCsv(noted, q(25), at(25), 'published')).toContain('observacoes;Valor impresso suspeito em 550 K.')
   })
   it('sem observações, nenhuma linha extra', () => {
-    expect(sourceReportText(src, q(50), at(50), 'published', 4)).not.toContain('Observações')
+    const bare = newSource({ id: 'b', shortName: 'B', fluidId: 'x', fluid: 'X' })
+    expect(sourceReportText(bare, q(50), at(50), 'published', 4)).not.toContain('Observações')
   })
 })
