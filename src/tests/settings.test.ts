@@ -20,3 +20,9 @@ describe('configurações iniciais (antes do IndexedDB responder)', () => {
     ).toEqual(DEFAULT_SETTINGS)
   })
 })
+
+describe('padrão do Comparar para ν, α e Pr', () => {
+  it('usa o publicado e, se a fonte não publicar, o calculado', () => {
+    expect(DEFAULT_SETTINGS.derivedChoice).toBe('published_else_calculated')
+  })
+})
