@@ -1,6 +1,6 @@
 # Incropera, Tabela A.6 — Propriedades termofísicas da água saturada (líquido).
-# 273,15 a 430 K: PDF fornecido pelo dono (Incropera agua Saturada.pdf). 440 a 645 K: mesma Tabela A.6, de um apêndice obtido na internet
-# (a página com essas linhas não veio no PDF). Massa específica convertida do volume específico: ρ = 1/v_f, com v_f·10³ em m³/kg.
+# Fonte: PDF fornecido pelo dono (Incropera agua Saturada.pdf), 273,15 a 430 K.
+# A tabela publica o volume específico: massa específica convertida por ρ = 1/v_f, com v_f·10³ em m³/kg.
 # ν e α não fazem parte da Tabela A.6: o app os calcula.
 # Unidades: T K; ρ kg/m³; cp kJ/(kg·K); μ·10⁶ N·s/m²; k·10³ W/(m·K).
 temperature;density;specific_heat;dynamic_viscosity;conductivity;prandtl
@@ -34,27 +34,3 @@ temperature;density;specific_heat;dynamic_viscosity;conductivity;prandtl
 410;928,5;4,278;200;688;1,24
 420;919,1;4,302;185;688;1,16
 430;909,9;4,331;173;685;1,09
-440;900,9;4,36;162;682;1,04
-450;890,5;4,40;152;678;0,99
-460;879,5;4,44;143;673;0,95
-470;868,1;4,48;136;667;0,92
-480;856,9;4,53;129;660;0,89
-490;844,6;4,59;124;651;0,87
-500;831,3;4,66;118;642;0,86
-510;818,3;4,74;113;631;0,85
-520;803,9;4,84;108;621;0,84
-530;788,6;4,95;104;608;0,85
-540;772,8;5,08;101;594;0,86
-550;755,9;5,24;97;580;0,87
-560;738,0;5,43;94;563;0,90
-570;718,4;5,68;91;548;0,94
-580;697,8;6,00;88;528;0,99
-590;674,8;6,41;84;513;1,05
-600;648,9;7,00;81;497;1,14
-610;620,3;7,85;77;467;1,30
-620;586,5;9,35;72;444;1,52
-625;562,4;10,6;70;430;1,65
-630;538,8;12,6;67;412;2,0
-635;516,8;16,4;64;392;2,7
-640;481,9;26;59;367;4,2
-645;425,4;90;54;331;12
