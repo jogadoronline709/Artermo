@@ -59,7 +59,7 @@ export const AGUA: FluidDef = {
         dynamicViscosity: 'uPa.s',
         conductivity: '1e-3 W/(m.K)',
       },
-      notes: `${SAT_NOTE} A tabela publica o volume específico do líquido; a massa específica foi convertida: ρ = 1/v_f. De 273,15 a 430 K, do PDF fornecido; de 440 a 645 K, da mesma Tabela A.6 (essa página não veio no PDF). ν e α não são publicados nessa tabela: o app os calcula (ν = μ/ρ, α = k/(ρ·cp)).`,
+      notes: `${SAT_NOTE} A tabela publica o volume específico do líquido; a massa específica foi convertida: ρ = 1/v_f. Vai de 273,15 a 430 K, como no PDF fornecido. ν e α não são publicados nessa tabela: o app os calcula (ν = μ/ρ, α = k/(ρ·cp)).`,
     },
     {
       id: 'cengel',

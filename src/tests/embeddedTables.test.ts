@@ -21,8 +21,6 @@ const TOL: Record<string, number> = { 'ar-kreith': 0.05, 'agua-kreith': 0.05 }
 const PRINTED: Record<string, string[]> = {
   // 75 °C: ν = 0,366 e Pr = 2,23 (μ/ρ ≈ 0,386; μ·cp/k ≈ 2,35). 300 °C: α = 0,132 e Pr = 0,98 (k/(ρ·cp) ≈ 0,139; μ·cp/k ≈ 0,93).
   'agua-kreith': ['T = 75 °C: ν', 'T = 75 °C: Pr', 'T = 300 °C: α', 'T = 300 °C: Pr'],
-  // Perto do ponto crítico (625, 630, 645 K) a Tabela A.6 dá cp com 2–3 algarismos.
-  'agua-incropera': ['T = 351,85 °C: Pr', 'T = 356,85 °C: Pr', 'T = 371,85 °C: Pr'],
 }
 
 describe('tabelas embutidas de Ar e Água', () => {
@@ -31,7 +29,7 @@ describe('tabelas embutidas de Ar e Água', () => {
     expect(ar.errors).toEqual({})
     expect(agua.errors).toEqual({})
     expect(counts(ar)).toEqual([11, 35, 41])
-    expect(counts(agua)).toEqual([23, 54, 40])
+    expect(counts(agua)).toEqual([23, 30, 40])
   })
 
   it.each([...ar.sources, ...agua.sources].map((s) => [s.id]))('%s: ν, α e Pr impressos batem com μ, ρ, k e cp', (id) => {
