@@ -1,4 +1,4 @@
-# Kreith, Tabela 27 — Ar seco à pressão atmosférica. Transcrito da imagem fornecida pelo dono.
+# Kreith, Tabela 28 — Ar seco em pressão atmosférica (Apêndice 2, p. A25). Conferido com o PDF fornecido pelo dono.
 # Unidades: T °C; ρ kg/m³; cp J/(kg·K); μ·10⁶ N·s/m²; ν·10⁶ m²/s; k W/(m·K); α·10⁶ m²/s.
 temperature;density;specific_heat;dynamic_viscosity;kinematic_viscosity;conductivity;thermal_diffusivity;prandtl
 0;1,252;1011;17,456;13,9;0,0237;19,2;0,71
