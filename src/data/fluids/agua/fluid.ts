@@ -33,7 +33,7 @@ export const AGUA: FluidDef = {
       id: 'kreith',
       shortName: 'Kreith',
       ...blank,
-      pageTable: 'Tabela 13 — Água na pressão de saturação',
+      pageTable: 'Tabela 13 — Água em pressão de saturação (Apêndice 2, p. A13)',
       ...SAT,
       originalTempUnit: 'C',
       inputUnits: {
@@ -44,7 +44,7 @@ export const AGUA: FluidDef = {
         conductivity: 'W/(m.K)',
         thermalDiffusivity: '1e-6 m2/s',
       },
-      notes: `${SAT_NOTE} A imagem fornecida termina em 280 °C (a linha de 300 °C está cortada). Colunas β e gβ/ν² não foram incluídas. Em 75 °C, ν (0,366) e Pr (2,23) impressos ficam cerca de 5 % abaixo de μ/ρ e μ·cp/k; mantidos como impressos.`,
+      notes: `${SAT_NOTE} Vai até 300 °C: a continuação da tabela não veio no material fornecido. Colunas β e gβ/ν² não foram incluídas. Em 75 °C, ν (0,366) e Pr (2,23), e em 300 °C, α (0,132) e Pr (0,98) impressos diferem cerca de 5 % de μ/ρ, k/(ρ·cp) e μ·cp/k; mantidos como impressos.`,
     },
     {
       id: 'incropera',
@@ -56,16 +56,16 @@ export const AGUA: FluidDef = {
       inputUnits: {
         density: 'kg/m3',
         specificHeat: 'kJ/(kg.K)',
-        dynamicViscosity: '1e-7 Pa.s',
+        dynamicViscosity: 'uPa.s',
         conductivity: '1e-3 W/(m.K)',
       },
-      notes: `${SAT_NOTE} ρ = 1/v_f. De 273,15 a 373,15 K, valores da tabela preparada pelo dono; de 375 a 645 K, da Tabela A.6 (a imagem da continuação não era legível). ν e α não são publicados nessa tabela: o app os calcula (ν = μ/ρ, α = k/(ρ·cp)).`,
+      notes: `${SAT_NOTE} A tabela publica o volume específico do líquido; a massa específica foi convertida: ρ = 1/v_f. De 273,15 a 430 K, do PDF fornecido; de 440 a 645 K, da mesma Tabela A.6 (essa página não veio no PDF). ν e α não são publicados nessa tabela: o app os calcula (ν = μ/ρ, α = k/(ρ·cp)).`,
     },
     {
       id: 'cengel',
       shortName: 'Çengel',
       ...blank,
-      pageTable: 'Tabela A-9 — Propriedades da água saturada (líquido)',
+      pageTable: 'Tabela A-9 — Propriedades da água saturada (líquido) (p. 878)',
       ...SAT,
       originalTempUnit: 'C',
       inputUnits: {
