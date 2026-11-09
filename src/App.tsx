@@ -16,7 +16,7 @@ import { SettingsPage } from './pages/SettingsPage'
 const NAV: { page: Route['page']; label: string; icon: string }[] = [
   { page: 'consultar', label: 'Consultar', icon: 'M4 18h16M7 18V9m5 9V5m5 13v-6' },
   { page: 'comparar', label: 'Comparar', icon: 'M5 7h14M5 12h14M5 17h14M9 4v16M15 4v16' },
-  { page: 'fluidos', label: 'Gases/Fluidos', icon: 'M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z' },
+  { page: 'fluidos', label: 'Fluidos', icon: 'M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z' },
   { page: 'config', label: 'Configurações', icon: 'M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm8 3-2-.6-.6-1.5 1-1.9-1.4-1.4-1.9 1-1.5-.6L13 4h-2l-.6 2-1.5.6-1.9-1-1.4 1.4 1 1.9L6 10.4 4 11v2l2 .6.6 1.5-1 1.9 1.4 1.4 1.9-1 1.5.6.6 2h2l.6-2 1.5-.6 1.9 1 1.4-1.4-1-1.9.6-1.5 2-.6z' },
 ]
 

@@ -8,7 +8,7 @@ describe('rotas', () => {
     expect(parseHash('#/fluidos/agua/kreith')).toEqual({ page: 'fluidos', fluidId: 'agua', refId: 'kreith' })
   })
 
-  it('links antigos da Biblioteca levam a Gases/Fluidos', () => {
+  it('links antigos da Biblioteca levam a Fluidos', () => {
     expect(parseHash('#/biblioteca')).toEqual({ page: 'fluidos' })
     expect(parseHash('#/biblioteca/kreith')).toEqual({ page: 'fluidos' })
   })

@@ -21,7 +21,7 @@ export function FluidsPage({ fluids }: Props) {
   return (
     <div className="page">
       <header className="page-head">
-        <h1>Gases/Fluidos</h1>
+        <h1>Fluidos</h1>
         <p className="page-lede">Escolha um fluido para ver as tabelas de cada referência e consultar suas propriedades. As tabelas vêm com o app e não podem ser alteradas.</p>
       </header>
 

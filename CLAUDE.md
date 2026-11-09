@@ -74,7 +74,7 @@ Pᵣ nunca deve ser confundido com Pr (Prandtl): no CSV, a coluna é `relative_p
 
 Distinguir claramente **valor tabelado** de **valor calculado**. Conversões de entrada ficam em `src/domain/units.ts` (temperatura °C/K/°F; cp em J ou kJ; μ em Pa·s, mPa·s, μPa·s e escalas 10⁻ⁿ; etc.). Mostrar as unidades ao lado de todos os valores. Nunca converter apenas o rótulo sem converter o valor.
 
-## 6. Gases/Fluidos
+## 6. Fluidos
 - Barra de pesquisa: ignora acentos, maiúsculas e espaços e procura no nome, na condição e nos apelidos (ex.: "agua", "water", "H₂O").
 - Cartões de fluido com nome exibido, categoria e quantas referências têm dados.
 - Página do fluido: aviso de faixa válida, botão **Consultar este fluido** (define o fluido ativo) e abas por referência com citação, pressão, observações e a **tabela completa somente leitura**, nas unidades do livro.
@@ -116,7 +116,7 @@ Na aba **Comparar / Média** (sempre dentro do fluido ativo):
 
 ## 10. Interface e experiência do usuário
 - Cabeçalho com "ArTermo — Propriedades termofísicas" e indicação de modo offline.
-- Navegação: **Consultar**, **Comparar**, **Gases/Fluidos**, **Configurações**.
+- Navegação: **Consultar**, **Comparar**, **Fluidos**, **Configurações**.
 - Priorizar celular: botões grandes, tabelas com rolagem horizontal, sem exigir zoom.
 - Gráfico opcional de propriedade × temperatura, uma curva por referência.
 - Copiar resultado e exportar consulta (CSV; PDF pela impressão do navegador).
@@ -144,7 +144,7 @@ Na aba **Comparar / Média** (sempre dentro do fluido ativo):
 - ν, α e Pr com unidades corretas.
 - Leitura CSV com ponto e vírgula, decimal brasileiro e comentários.
 - Fluidos: busca, faixa válida, carregamento das tabelas embutidas, isolamento entre fluidos e **validade de todas as tabelas embutidas**.
-- Rotas (inclusive links antigos `#/biblioteca` → Gases/Fluidos) e atualização do banco local.
+- Rotas (inclusive links antigos `#/biblioteca` → Fluidos) e atualização do banco local.
 
 ## 14. Organização
 - `src/domain/`: tipos, unidades, interpolação, média, fórmulas e fluidos (busca, faixa válida).
@@ -163,7 +163,7 @@ Preservar a separação entre lógica de cálculo, dados e interface.
 6. Rode `npm run check`. O teste "todas as tabelas embutidas são válidas" falha se houver qualquer erro de validação ou CSV sem fluido/referência correspondente.
 
 ## 16. Critérios de aceite
-- Gases/Fluidos lista Ar e Água (1 atm), com busca funcionando com acentos, maiúsculas e "H₂O".
+- Fluidos lista Ar e Água (1 atm), com busca funcionando com acentos, maiúsculas e "H₂O".
 - Cada referência mostra a tabela somente leitura, ou o aviso de tabela não disponível.
 - Consultar e Comparar usam o fluido ativo, com interpolação detalhada e média com n/N.
 - O app trata ausência de dados, unidade, pressão e faixa válida sem mascarar problemas.
