@@ -39,10 +39,10 @@ Ar e Água têm as referências Kreith, Incropera e Çengel, todas já embutidas
 
 | Fluido | Kreith | Incropera | Çengel |
 |---|---|---|---|
-| Ar (1 atm) | Tabela 28, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
-| Água (líquido saturado) | Tabela 13, 0–300 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
+| Ar (1 atm) | Tabela 27, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
+| Água (líquido saturado) | Tabela 13, 0–280 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
 
-`src/tests/embeddedTables.test.ts` confere cada tabela (ν, α, Pr impressos × μ/ρ, k/(ρ·cp), μ·cp/k), com tolerância maior para o Kreith (Pr com 2 algarismos) e uma lista de pontos em que o livro impresso diverge — conferidos na imagem e mantidos como impressos (Kreith água 75 °C ν e Pr, e 300 °C α e Pr; Incropera água perto do ponto crítico). Na água do Incropera, a massa específica é convertida do volume específico da A.6: ρ = 1/v_f. O "Ar (gás ideal)" (Tabela A-17) foi retirado a pedido do dono; o conjunto `gasIdeal` continua suportado. Referência sem CSV mostra "Tabela ainda não disponível nesta versão do app."
+`src/tests/embeddedTables.test.ts` confere cada tabela (ν, α, Pr impressos × μ/ρ, k/(ρ·cp), μ·cp/k), com tolerância maior para o Kreith (Pr com 2 algarismos) e uma lista de pontos em que o livro impresso diverge — conferidos na imagem e mantidos como impressos (Incropera ar 1300 K α; Kreith água 75 °C ν e Pr; Incropera água perto do ponto crítico). O "Ar (gás ideal)" (Tabela A-17) foi retirado a pedido do dono; o conjunto `gasIdeal` continua suportado. Referência sem CSV mostra "Tabela ainda não disponível nesta versão do app."
 
 Metadados por referência (`ReferenceDef`): nome curto, autores, título, edição, ano, página/tabela, pressão de referência, unidade original de temperatura, unidades das colunas e observações. Não presumir nenhum deles.
 

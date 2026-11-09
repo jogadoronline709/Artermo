@@ -22,7 +22,7 @@ export const AR: FluidDef = {
       id: 'kreith',
       shortName: 'Kreith',
       ...blank,
-      pageTable: 'Tabela 28 — Ar seco em pressão atmosférica (Apêndice 2, p. A25)',
+      pageTable: 'Tabela 27 — Ar seco à pressão atmosférica',
       ...ATM,
       originalTempUnit: 'C',
       inputUnits: {
@@ -50,13 +50,13 @@ export const AR: FluidDef = {
         conductivity: '1e-3 W/(m.K)',
         thermalDiffusivity: '1e-6 m2/s',
       },
-      notes: 'Inclui a continuação da tabela (1700 K a 3000 K). Só o ar; a amônia da mesma tabela não foi incluída.',
+      notes: 'Inclui a continuação da tabela (1700 K a 3000 K). Em 1300 K, o α impresso (238×10⁻⁶ m²/s) é cerca de 8 % menor que k/(ρ·cp); mantido como impresso.',
     },
     {
       id: 'cengel',
       shortName: 'Çengel',
       ...blank,
-      pageTable: 'Tabela A-15 — Propriedades do ar a 1 atm de pressão (p. 884)',
+      pageTable: 'Tabela A-15 — Propriedades do ar a 1 atm de pressão',
       ...ATM,
       originalTempUnit: 'C',
       inputUnits: {
