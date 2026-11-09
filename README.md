@@ -4,8 +4,8 @@ Aplicativo web instalável (PWA) para estudo de Transferência de Calor. O ArTer
 
 | Fluido | Kreith | Incropera | Çengel |
 |---|---|---|---|
-| Ar (1 atm) | Tabela 28, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
-| Água (líquido saturado) | Tabela 13, 0–300 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
+| Ar (1 atm) | Tabela 27, 0–1000 °C | Tabela A.4, 100–3000 K | Tabela A-15, −150–2000 °C |
+| Água (líquido saturado) | Tabela 13, 0–280 °C | Tabela A.6, 273,15–645 K | Tabela A-9, 0,01–374,14 °C |
 
 E o app:
 
