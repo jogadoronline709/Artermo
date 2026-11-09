@@ -24,7 +24,7 @@ export function FluidPage({ fluid, refId }: Props) {
     <div className="page">
       <header className="page-head fluid-head">
         <p className="muted small">
-          <a href={href({ page: 'fluidos' })}>Gases/Fluidos</a> › {categoryLabel(def.category)}
+          <a href={href({ page: 'fluidos' })}>Fluidos</a> › {categoryLabel(def.category)}
         </p>
         <h1>{fluidDisplayName(def)}</h1>
         {def.validRange && <p className="page-lede">{def.validRange.message}</p>}

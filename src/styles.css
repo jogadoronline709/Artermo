@@ -1259,7 +1259,7 @@ tbody tr:last-child td {
   color: var(--ink-3);
 }
 
-/* ---------- Cartões (Gases/Fluidos) ---------- */
+/* ---------- Cartões (Fluidos) ---------- */
 
 .source-list {
   list-style: none;
@@ -1583,7 +1583,7 @@ tbody tr:last-child td {
   }
 }
 
-/* Gases/Fluidos */
+/* Fluidos */
 .fluid-search {
   display: grid;
   gap: 0.35rem;

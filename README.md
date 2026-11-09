@@ -53,7 +53,7 @@ O modo offline (service worker) só funciona na versão de produção (`npm run 
 
 ## Como usar
 
-1. **Gases/Fluidos** → pesquise o fluido (aceita "água", "agua", "water", "H₂O"…) e abra-o. Cada referência mostra a citação, a pressão de referência e a tabela completa, nas unidades do livro.
+1. **Fluidos** → pesquise o fluido (aceita "água", "agua", "water", "H₂O"…) e abra-o. Cada referência mostra a citação, a pressão de referência e a tabela completa, nas unidades do livro.
 2. Clique em **Consultar este fluido**. Consultar e Comparar passam a usar só as referências desse fluido (o topo mostra "Fluido: …").
 3. **Consultar** → digite a temperatura e escolha a referência. Abra "Como foi calculado?" para conferir a conta.
 4. **Comparar** → escolha as referências, o modo da média (exigir todas ou fontes disponíveis) e se ν, α e Pr devem usar o valor publicado ou o calculado.
@@ -143,7 +143,7 @@ src/
   data/        tabelas embutidas (fluids/), leitor CSV, IndexedDB (Dexie) para preferências, favoritos e histórico
   hooks/       configurações, rotas, estado online/instalação
   components/  régua de temperatura, linhas de propriedade, "Como foi calculado?", comparação, gráfico, tabela somente leitura
-  pages/       Consultar, Gases/Fluidos, página do fluido, Configurações
+  pages/       Consultar, Fluidos, página do fluido, Configurações
   lib/         arquivos (download/cópia), seleção do Comparar e relatórios CSV/texto
   tests/       testes unitários (Vitest) com dados sintéticos
 public/        ícones PWA e favicon

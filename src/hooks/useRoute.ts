@@ -18,7 +18,7 @@ export function parseHash(hash: string): Route {
       if (parts[1] && parts[2]) r.refId = parts[2]
       return r
     }
-    // A antiga Biblioteca editável virou Gases/Fluidos.
+    // A antiga Biblioteca editável virou Fluidos.
     case 'biblioteca':
       return { page: 'fluidos' }
     case 'config':
